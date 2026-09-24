@@ -1,0 +1,973 @@
+<!DOCTYPE html>
+<html lang="fr" class="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ARES // Portal Exécutif Local</title>
+    
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- Custom Tailwind Theme Setup -->
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        ares: {
+                            bg: '#05070B',
+                            card: '#0C1017',
+                            border: '#1E2638',
+                            gold: '#D4AF37',
+                            goldHover: '#F5C242',
+                            cyan: '#06B6D4',
+                            emerald: '#10B981',
+                            rose: '#F43F5E'
+                        }
+                    },
+                    fontFamily: {
+                        sans: ['Inter', 'system-ui', 'sans-serif'],
+                        mono: ['JetBrains Mono', 'monospace']
+                    }
+                }
+            }
+        }
+    </script>
+
+    <!-- Google Fonts & FontAwesome -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <!-- CSS Styling for Visual Aesthetics -->
+    <style>
+        body {
+            background-color: #05070b;
+            background-image: 
+                radial-gradient(at 0% 0%, rgba(212, 175, 55, 0.07) 0px, transparent 50%),
+                radial-gradient(at 100% 0%, rgba(6, 182, 212, 0.06) 0px, transparent 50%),
+                radial-gradient(at 50% 100%, rgba(16, 185, 129, 0.05) 0px, transparent 50%);
+            background-attachment: fixed;
+        }
+
+        .glass-panel {
+            background: rgba(12, 16, 23, 0.75);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+        }
+
+        .glass-panel-hover {
+            transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+
+        .glass-panel-hover:hover {
+            transform: translateY(-3px);
+            background: rgba(22, 30, 46, 0.85);
+            border-color: rgba(212, 175, 55, 0.3);
+            box-shadow: 0 15px 35px -10px rgba(0, 0, 0, 0.6), 0 0 20px 0 rgba(212, 175, 55, 0.12);
+        }
+
+        .pulse-status {
+            box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.6);
+            animation: pulse-status 2.2s infinite;
+        }
+
+        @keyframes pulse-status {
+            0% { box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.6); }
+            70% { box-shadow: 0 0 0 7px rgba(16, 185, 129, 0); }
+            100% { box-shadow: 0 0 0 0 rgba(16, 185, 129, 0); }
+        }
+
+        /* Smooth Clock Transition */
+        .clock-fade-enter {
+            opacity: 0;
+            transform: translateY(-4px) scale(0.98);
+        }
+        .clock-fade-active {
+            opacity: 1;
+            transform: translateY(0) scale(1);
+            transition: opacity 0.35s cubic-bezier(0.16, 1, 0.3, 1), transform 0.35s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+        .clock-fade-exit {
+            opacity: 0;
+            transform: translateY(4px) scale(0.98);
+            transition: opacity 0.25s ease-in, transform 0.25s ease-in;
+        }
+
+        /* Custom Scrollbar */
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #05070b;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #1e2638;
+            border-radius: 4px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #2d3a54;
+        }
+    </style>
+</head>
+<body class="text-slate-200 font-sans min-h-screen flex flex-col justify-between antialiased selection:bg-amber-500/30 selection:text-amber-200">
+
+    <!-- HEADER -->
+    <header class="border-b border-slate-800/80 glass-panel sticky top-0 z-40 px-4 lg:px-8 py-3">
+        <div class="max-w-7xl mx-auto flex flex-col lg:flex-row items-center justify-between gap-4">
+            
+            <!-- Brand & Status -->
+            <div class="flex items-center gap-4 w-full lg:w-auto justify-between lg:justify-start">
+                <div class="flex items-center gap-3">
+                    <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-amber-400 via-amber-600 to-amber-700 flex items-center justify-center text-slate-950 font-bold shadow-lg shadow-amber-500/20 border border-amber-300/40">
+                        <i class="fa-solid font-mono text-xl text-slate-950">A</i>
+                    </div>
+                    <div>
+                        <div class="flex items-center gap-2">
+                            <h1 class="font-bold text-lg tracking-wider text-white font-mono uppercase">Ares // Local Hub</h1>
+                            <span class="bg-amber-500/10 text-amber-400 border border-amber-500/30 text-[10px] font-mono px-2 py-0.5 rounded font-semibold uppercase">Localhost v3.8</span>
+                        </div>
+                        <p class="text-xs text-slate-400 font-mono">PORTAIL DE REDIRECTION ET D'OUTILS</p>
+                    </div>
+                </div>
+
+                <!-- Global Status Indicator (Mobile) -->
+                <div class="flex lg:hidden items-center gap-2 bg-emerald-950/40 border border-emerald-500/30 px-3 py-1 rounded-full">
+                    <span class="w-2 h-2 rounded-full bg-emerald-500 pulse-status"></span>
+                    <span class="text-[11px] font-mono text-emerald-400 font-medium">LOCAL READY</span>
+                </div>
+            </div>
+
+            <!-- Central Live Search -->
+            <div class="w-full lg:max-w-md relative">
+                <i class="fa-solid fa-magnifying-glass absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400 text-sm"></i>
+                <input type="text" id="searchInput" oninput="filterCards()" placeholder="Rechercher un outil, IP local, ou sous-système..." 
+                       class="w-full pl-10 pr-10 py-2 bg-slate-900/90 border border-slate-700/80 rounded-xl text-sm text-slate-200 placeholder-slate-500 focus:outline-none focus:border-amber-500/60 focus:ring-1 focus:ring-amber-500/40 transition-all">
+                <button onclick="clearSearch()" id="clearSearchBtn" class="hidden absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-white text-xs">
+                    <i class="fa-solid fa-xmark"></i>
+                </button>
+            </div>
+
+            <!-- MULTI-TIMEZONE ROTATING CLOCK WIDGET -->
+            <div id="clockWidgetContainer" onmouseenter="pauseClockRotation()" onmouseleave="resumeClockRotation()" 
+                 class="w-full lg:w-auto flex items-center justify-between lg:justify-end gap-3 bg-slate-900/90 border border-slate-800 p-2 px-3 rounded-xl shadow-inner relative group transition-all">
+                
+                <!-- Local Status dot -->
+                <div class="hidden sm:flex items-center gap-2 pr-3 border-r border-slate-800/80">
+                    <span class="w-2 h-2 rounded-full bg-emerald-500 pulse-status"></span>
+                    <span class="text-[10px] font-mono text-slate-400 font-semibold tracking-wider uppercase">LOCAL // OK</span>
+                </div>
+
+                <!-- Clock Display Card -->
+                <div id="clockContainer" class="flex items-center gap-3 min-w-[245px] justify-between clock-fade-active">
+                    <div class="flex items-center gap-2.5">
+                        <span id="tzFlag" class="text-xl leading-none select-none">🇨🇦</span>
+                        <div class="flex flex-col">
+                            <div class="flex items-center gap-1.5">
+                                <span id="tzCity" class="text-xs font-bold tracking-wide uppercase font-mono text-amber-400">Toronto</span>
+                                <span id="tzBadge" class="text-[9px] font-mono px-1.5 py-0.2 rounded border bg-amber-500/10 text-amber-300 border-amber-500/30">EST</span>
+                            </div>
+                            <span id="tzDate" class="text-[10px] text-slate-400 font-mono tracking-tight">Mer. 23 Sep 2026</span>
+                        </div>
+                    </div>
+
+                    <div class="text-right pl-2">
+                        <div id="tzTime" class="font-mono text-sm font-bold text-slate-100 tracking-wider">15:48:29</div>
+                        <div id="tzOffset" class="text-[9px] font-mono text-slate-500">UTC-4</div>
+                    </div>
+                </div>
+
+                <!-- Clock Controls & Rotation State -->
+                <div class="flex items-center gap-1 pl-2 border-l border-slate-800">
+                    <button onclick="prevTimezone()" title="Ville précédente" class="p-1 text-slate-500 hover:text-slate-200 transition-colors rounded hover:bg-slate-800 text-xs">
+                        <i class="fa-solid fa-chevron-left"></i>
+                    </button>
+                    <button id="pausePlayBtn" onclick="toggleClockPause()" title="Mettre en pause / Reprendre" class="p-1 text-slate-500 hover:text-slate-200 transition-colors rounded hover:bg-slate-800 text-xs">
+                        <i class="fa-solid fa-pause"></i>
+                    </button>
+                    <button onclick="nextTimezone()" title="Ville suivante" class="p-1 text-slate-500 hover:text-slate-200 transition-colors rounded hover:bg-slate-800 text-xs">
+                        <i class="fa-solid fa-chevron-right"></i>
+                    </button>
+                </div>
+
+                <!-- Dots indicator -->
+                <div id="tzDots" class="absolute -bottom-1.5 left-1/2 -translate-x-1/2 flex items-center gap-1">
+                    <!-- Dots dynamically generated -->
+                </div>
+            </div>
+
+        </div>
+    </header>
+
+    <!-- MAIN HUB CONTAINER -->
+    <main class="max-w-7xl mx-auto px-4 lg:px-8 py-8 flex-grow w-full space-y-10">
+
+        <!-- CATEGORY 1: ARES WORLD -->
+        <section class="category-section" data-category="world">
+            <div class="flex items-center justify-between mb-5 border-b border-slate-800/80 pb-3">
+                <div class="flex items-center gap-3">
+                    <div class="p-2 rounded-lg bg-amber-500/10 text-amber-400 border border-amber-500/20">
+                        <i class="fa-solid fa-globe text-base"></i>
+                    </div>
+                    <div>
+                        <h2 class="text-lg font-semibold text-white tracking-wide uppercase font-mono">01 // Ares World</h2>
+                        <p class="text-xs text-slate-400">Holding & Stratégie Globale, Actifs et Données Centralisées</p>
+                    </div>
+                </div>
+                <span class="text-xs font-mono text-slate-500 font-medium" id="count-world">0 module</span>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5" id="grid-world">
+                <!-- Dynamically populated via JS -->
+            </div>
+        </section>
+
+        <!-- CATEGORY 2: ARES OPSEC -->
+        <section class="category-section" data-category="opsec">
+            <div class="flex items-center justify-between mb-5 border-b border-slate-800/80 pb-3">
+                <div class="flex items-center gap-3">
+                    <div class="p-2 rounded-lg bg-cyan-500/10 text-cyan-400 border border-cyan-500/20">
+                        <i class="fa-solid fa-shield-halved text-base"></i>
+                    </div>
+                    <div>
+                        <h2 class="text-lg font-semibold text-white tracking-wide uppercase font-mono">02 // Ares OpSec</h2>
+                        <p class="text-xs text-slate-400">Sécurité Opérationnelle, Tunnels Réseaux & Coffres-Forts</p>
+                    </div>
+                </div>
+                <span class="text-xs font-mono text-slate-500 font-medium" id="count-opsec">0 module</span>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5" id="grid-opsec">
+                <!-- Dynamically populated via JS -->
+            </div>
+        </section>
+
+        <!-- CATEGORY 3: INDICE PUBLIC -->
+        <section class="category-section" data-category="indice">
+            <div class="flex items-center justify-between mb-5 border-b border-slate-800/80 pb-3">
+                <div class="flex items-center gap-3">
+                    <div class="p-2 rounded-lg bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">
+                        <i class="fa-solid fa-building-columns text-base"></i>
+                    </div>
+                    <div>
+                        <h2 class="text-lg font-semibold text-white tracking-wide uppercase font-mono">03 // Indice Public</h2>
+                        <p class="text-xs text-slate-400">Affaires Publiques, Intelligence Réglementaire & Analyse Média</p>
+                    </div>
+                </div>
+                <span class="text-xs font-mono text-slate-500 font-medium" id="count-indice">0 module</span>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5" id="grid-indice">
+                <!-- Dynamically populated via JS -->
+            </div>
+        </section>
+
+        <!-- No Search Results Container -->
+        <div id="noResults" class="hidden text-center py-16 glass-panel rounded-2xl border border-dashed border-slate-800">
+            <i class="fa-solid fa-folder-open text-4xl text-slate-600 mb-3"></i>
+            <h3 class="text-slate-300 font-semibold text-lg">Aucun outil ne correspond à votre recherche</h3>
+            <p class="text-slate-500 text-sm mt-1">Vérifiez les termes recherchés ou réinitialisez le filtre.</p>
+            <button onclick="clearSearch()" class="mt-4 px-4 py-2 bg-amber-500/20 hover:bg-amber-500/30 text-amber-300 text-xs font-mono rounded-lg border border-amber-500/30 transition-all">
+                Réinitialiser la recherche
+            </button>
+        </div>
+
+    </main>
+
+    <!-- FOOTER & ACTION BAR -->
+    <footer class="border-t border-slate-800/80 glass-panel py-6 px-4 lg:px-8 mt-12">
+        <div class="max-w-7xl mx-auto flex flex-col md:flex-row items-center justify-between gap-4">
+            
+            <!-- Quick Management Buttons -->
+            <div class="flex flex-wrap items-center justify-center md:justify-start gap-3">
+                <button onclick="openAddModal()" class="px-3.5 py-2 bg-amber-500/10 hover:bg-amber-500/20 text-amber-400 border border-amber-500/30 rounded-lg text-xs font-mono font-medium flex items-center gap-2 transition-all">
+                    <i class="fa-solid fa-plus"></i>
+                    <span>Ajouter un Outil</span>
+                </button>
+                <button onclick="exportConfig()" class="px-3.5 py-2 bg-slate-800/80 hover:bg-slate-700/80 text-slate-300 border border-slate-700/60 rounded-lg text-xs font-mono font-medium flex items-center gap-2 transition-all">
+                    <i class="fa-solid fa-download"></i>
+                    <span>Exporter (JSON)</span>
+                </button>
+                <label class="px-3.5 py-2 bg-slate-800/80 hover:bg-slate-700/80 text-slate-300 border border-slate-700/60 rounded-lg text-xs font-mono font-medium flex items-center gap-2 cursor-pointer transition-all">
+                    <i class="fa-solid fa-upload"></i>
+                    <span>Importer (JSON)</span>
+                    <input type="file" id="importFile" accept=".json" onchange="importConfig(event)" class="hidden">
+                </label>
+                <button onclick="resetToDefaults()" class="px-3.5 py-2 bg-slate-900 hover:bg-rose-950/40 text-slate-400 hover:text-rose-400 border border-slate-800 hover:border-rose-800/40 rounded-lg text-xs font-mono font-medium flex items-center gap-2 transition-all">
+                    <i class="fa-solid fa-rotate-left"></i>
+                    <span>Réinitialiser URLs</span>
+                </button>
+            </div>
+
+            <div class="text-center md:text-right text-xs text-slate-500 font-mono">
+                &copy; GROUPE ARES // ENVIRONNEMENT DE PILOTAGE LOCAL
+            </div>
+
+        </div>
+    </footer>
+
+    <!-- EDIT & ADD CARD MODAL -->
+    <div id="editModal" class="fixed inset-0 bg-slate-950/80 backdrop-blur-md z-50 flex items-center justify-center p-4 hidden">
+        <div class="glass-panel w-full max-w-lg rounded-2xl border border-slate-700/80 p-6 shadow-2xl relative">
+            
+            <div class="flex items-center justify-between pb-4 border-b border-slate-800">
+                <div class="flex items-center gap-2">
+                    <i class="fa-solid fa-sliders text-amber-400"></i>
+                    <h3 class="font-bold text-white font-mono uppercase text-sm" id="modalTitle">Configuration de l'outil</h3>
+                </div>
+                <button onclick="closeModal()" class="text-slate-400 hover:text-white transition-colors">
+                    <i class="fa-solid fa-xmark text-lg"></i>
+                </button>
+            </div>
+
+            <form id="cardForm" onsubmit="saveCardData(event)" class="space-y-4 mt-4">
+                <input type="hidden" id="cardId">
+
+                <div>
+                    <label class="block text-xs font-mono text-slate-400 uppercase mb-1">Nom du module / outil</label>
+                    <input type="text" id="cardTitle" required class="w-full px-3.5 py-2 bg-slate-900 border border-slate-700 rounded-lg text-sm text-white focus:outline-none focus:border-amber-500">
+                </div>
+
+                <div>
+                    <label class="block text-xs font-mono text-slate-400 uppercase mb-1">Pôle ARES</label>
+                    <select id="cardCategory" required class="w-full px-3.5 py-2 bg-slate-900 border border-slate-700 rounded-lg text-sm text-white focus:outline-none focus:border-amber-500">
+                        <option value="world">Ares World (Holding & Strategy)</option>
+                        <option value="opsec">Ares OpSec (Security & Infrastructure)</option>
+                        <option value="indice">Indice Public (Governance & Public Affairs)</option>
+                    </select>
+                </div>
+
+                <div>
+                    <label class="block text-xs font-mono text-slate-400 uppercase mb-1">URL / Adresse d'accès (ex: http://localhost:8080 ou IP)</label>
+                    <input type="text" id="cardUrl" required placeholder="http://localhost:8080 ou http://192.168.1.50" class="w-full px-3.5 py-2 bg-slate-900 border border-slate-700 rounded-lg text-sm text-white focus:outline-none focus:border-amber-500 font-mono text-xs">
+                </div>
+
+                <div>
+                    <label class="block text-xs font-mono text-slate-400 uppercase mb-1">Description succincte</label>
+                    <input type="text" id="cardDescription" required class="w-full px-3.5 py-2 bg-slate-900 border border-slate-700 rounded-lg text-sm text-white focus:outline-none focus:border-amber-500">
+                </div>
+
+                <div class="grid grid-cols-2 gap-3">
+                    <div>
+                        <label class="block text-xs font-mono text-slate-400 uppercase mb-1">Statut du module</label>
+                        <select id="cardStatus" class="w-full px-3.5 py-2 bg-slate-900 border border-slate-700 rounded-lg text-sm text-white focus:outline-none focus:border-amber-500">
+                            <option value="Opérationnel">Opérationnel</option>
+                            <option value="Local Ready">Local Ready</option>
+                            <option value="Tunnel Actif">Tunnel Actif</option>
+                            <option value="Maintenance">Maintenance</option>
+                            <option value="Securisé">Sécurisé</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="block text-xs font-mono text-slate-400 uppercase mb-1">Icône (FontAwesome)</label>
+                        <input type="text" id="cardIcon" placeholder="fa-solid fa-server" required class="w-full px-3.5 py-2 bg-slate-900 border border-slate-700 rounded-lg text-sm text-white focus:outline-none focus:border-amber-500 font-mono text-xs">
+                    </div>
+                </div>
+
+                <div class="flex items-center justify-between pt-4 border-t border-slate-800 mt-6">
+                    <button type="button" id="deleteCardBtn" onclick="deleteCurrentCard()" class="px-4 py-2 bg-rose-950/40 hover:bg-rose-900/60 text-rose-300 border border-rose-800/40 rounded-lg text-xs font-mono transition-all hidden">
+                        Supprimer
+                    </button>
+                    <div class="flex items-center gap-2 ml-auto">
+                        <button type="button" onclick="closeModal()" class="px-4 py-2 bg-slate-800 hover:bg-slate-700 text-slate-300 rounded-lg text-xs font-mono transition-all">
+                            Annuler
+                        </button>
+                        <button type="submit" class="px-4 py-2 bg-amber-500 hover:bg-amber-600 text-slate-950 font-bold rounded-lg text-xs font-mono transition-all shadow-lg shadow-amber-500/20">
+                            Enregistrer
+                        </button>
+                    </div>
+                </div>
+            </form>
+
+        </div>
+    </div>
+
+    <!-- NOTIFICATION TOAST -->
+    <div id="toast" class="fixed bottom-6 right-6 bg-slate-900 border border-amber-500/40 text-slate-200 px-4 py-3 rounded-xl shadow-2xl z-50 flex items-center gap-3 transform translate-y-20 opacity-0 transition-all duration-300">
+        <i class="fa-solid fa-circle-check text-amber-400 text-lg"></i>
+        <span id="toastMessage" class="text-xs font-mono">Opération effectuée avec succès.</span>
+    </div>
+
+    <!-- JAVASCRIPT LOGIC -->
+    <script>
+        // 1. TIMEZONE DATA & CAROUSEL CONFIGURATION
+        const TIMEZONES = [
+            {
+                city: 'Toronto',
+                flag: '🇨🇦',
+                zone: 'America/Toronto',
+                badge: 'EST/EDT',
+                textColor: 'text-amber-400',
+                badgeStyle: 'bg-amber-500/10 text-amber-300 border-amber-500/30'
+            },
+            {
+                city: 'Roatán',
+                flag: '🇭🇳',
+                zone: 'America/Tegucigalpa',
+                badge: 'CST',
+                textColor: 'text-sky-400',
+                badgeStyle: 'bg-sky-500/10 text-sky-300 border-sky-500/30'
+            },
+            {
+                city: 'Montevideo',
+                flag: '🇺🇾',
+                zone: 'America/Montevideo',
+                badge: 'UYT',
+                textColor: 'text-cyan-400',
+                badgeStyle: 'bg-cyan-500/10 text-cyan-300 border-cyan-500/30'
+            },
+            {
+                city: 'Buenos Aires',
+                flag: '🇦🇷',
+                zone: 'America/Argentina/Buenos_Aires',
+                badge: 'ART',
+                textColor: 'text-blue-400',
+                badgeStyle: 'bg-blue-500/10 text-blue-300 border-blue-500/30'
+            },
+            {
+                city: 'Edinburgh',
+                flag: '🏴󠁧󠁢󠁳󠁣󠁴󠁿',
+                zone: 'Europe/London',
+                badge: 'GMT/BST',
+                textColor: 'text-indigo-400',
+                badgeStyle: 'bg-indigo-500/10 text-indigo-300 border-indigo-500/30'
+            },
+            {
+                city: 'Mallorca',
+                flag: '🇪🇸',
+                zone: 'Europe/Madrid',
+                badge: 'CET/CEST',
+                textColor: 'text-yellow-400',
+                badgeStyle: 'bg-yellow-500/10 text-yellow-300 border-yellow-500/30'
+            },
+            {
+                city: 'Cortina',
+                flag: '🇮🇹',
+                zone: 'Europe/Rome',
+                badge: 'CET/CEST',
+                textColor: 'text-emerald-400',
+                badgeStyle: 'bg-emerald-500/10 text-emerald-300 border-emerald-500/30'
+            },
+            {
+                city: 'Singapore',
+                flag: '🇸🇬',
+                zone: 'Asia/Singapore',
+                badge: 'SGT',
+                textColor: 'text-rose-400',
+                badgeStyle: 'bg-rose-500/10 text-rose-300 border-rose-500/30'
+            }
+        ];
+
+        let currentTzIdx = 0;
+        let tzRotationTimer = null;
+        let isClockPaused = false;
+
+        // 2. DEFAULT CARDS DATA (SUITED FOR LOCAL / HYBRID HOSTE)
+        const DEFAULT_CARDS = [
+            // Pôle Ares World
+            {
+                id: 'world-1',
+                category: 'world',
+                title: 'Global Logistics & Routes Dashboard',
+                description: 'Suivi de la flotte, hubs logistiques régionaux et chaînes d\'approvisionnement.',
+                url: 'http://localhost:8080/logistics',
+                status: 'Opérationnel',
+                icon: 'fa-solid fa-route'
+            },
+            {
+                id: 'world-2',
+                category: 'world',
+                title: 'Central Data Store & Repositories',
+                description: 'Dépôts d\'archives, stockage de données stratégiques et sauvegarde d\'actifs.',
+                url: 'http://192.168.1.100:9000',
+                status: 'Local Ready',
+                icon: 'fa-solid fa-database'
+            },
+            {
+                id: 'world-3',
+                category: 'world',
+                title: 'Financial & Asset Holdings Overview',
+                description: 'Supervision des comptes d\'investissement, capitaux et gestion de portefeuille.',
+                url: 'http://localhost:3000/finance',
+                status: 'Opérationnel',
+                icon: 'fa-solid fa-chart-pie'
+            },
+
+            // Pôle Ares OpSec
+            {
+                id: 'opsec-1',
+                category: 'opsec',
+                title: 'Security Operations Center (SOC)',
+                description: 'Moniteur d\'alertes, détection d\'intrusions réseau et télémétrie des systèmes.',
+                url: 'http://localhost:5000/soc',
+                status: 'Securisé',
+                icon: 'fa-solid fa-shield-halved'
+            },
+            {
+                id: 'opsec-2',
+                category: 'opsec',
+                title: 'Network Tunnels & Gateways',
+                description: 'Gestionnaire de passerelles Cloudflared, tunnels VPN locaux et proxys d\'accès.',
+                url: 'http://127.0.0.1:8443',
+                status: 'Tunnel Actif',
+                icon: 'fa-solid fa-network-wired'
+            },
+            {
+                id: 'opsec-3',
+                category: 'opsec',
+                title: 'Encrypted Identity & Access Vault',
+                description: 'Gestionnaire de clés, coffre-fort d\'identifiants et certificats de sécurité.',
+                url: 'http://localhost:8000/vault',
+                status: 'Securisé',
+                icon: 'fa-solid fa-key'
+            },
+
+            // Pôle Indice Public
+            {
+                id: 'indice-1',
+                category: 'indice',
+                title: 'Public Policy & Regulatory Intelligence',
+                description: 'Veille législative, cartographie décisionnelle et suivi des réformes institutionnelles.',
+                url: 'http://localhost:4000/regulatory',
+                status: 'Opérationnel',
+                icon: 'fa-solid fa-scale-balanced'
+            },
+            {
+                id: 'indice-2',
+                category: 'indice',
+                title: 'Media & Communications Monitor',
+                description: 'Analyse d\'opinion publique, revue de presse stratégique et écoute des réseaux.',
+                url: 'http://localhost:4000/media',
+                status: 'Opérationnel',
+                icon: 'fa-solid fa-newspaper'
+            },
+            {
+                id: 'indice-3',
+                category: 'indice',
+                title: 'Strategic Analytics & Survey Hub',
+                description: 'Moteur de sondages internes, matrices d\'impact et rapports stratégiques.',
+                url: 'http://localhost:4000/analytics',
+                status: 'Opérationnel',
+                icon: 'fa-solid fa-chart-line'
+            }
+        ];
+
+        let cardsData = [];
+
+        // 3. INITIALIZATION
+        function initApp() {
+            const saved = localStorage.getItem('ares_hub_cards_local');
+            if (saved) {
+                try {
+                    cardsData = JSON.parse(saved);
+                } catch(e) {
+                    cardsData = [...DEFAULT_CARDS];
+                }
+            } else {
+                cardsData = [...DEFAULT_CARDS];
+            }
+
+            renderAllCards();
+            initClockWidget();
+        }
+
+        // 4. WORLD CLOCK CAROUSEL
+        function initClockWidget() {
+            renderClockDots();
+            updateClockDisplay();
+
+            // Refresh time string every second
+            setInterval(updateClockDisplay, 1000);
+
+            // Start auto rotation
+            startClockRotation();
+        }
+
+        function startClockRotation() {
+            if (tzRotationTimer) clearInterval(tzRotationTimer);
+            tzRotationTimer = setInterval(() => {
+                if (!isClockPaused) {
+                    nextTimezone(false);
+                }
+            }, 3500);
+        }
+
+        function pauseClockRotation() {
+            isClockPaused = true;
+            updatePauseButtonUI();
+        }
+
+        function resumeClockRotation() {
+            isClockPaused = false;
+            updatePauseButtonUI();
+        }
+
+        function toggleClockPause() {
+            isClockPaused = !isClockPaused;
+            updatePauseButtonUI();
+        }
+
+        function updatePauseButtonUI() {
+            const btn = document.getElementById('pausePlayBtn');
+            if (isClockPaused) {
+                btn.innerHTML = `<i class="fa-solid fa-play text-amber-400"></i>`;
+                btn.title = "Reprendre la rotation";
+            } else {
+                btn.innerHTML = `<i class="fa-solid fa-pause"></i>`;
+                btn.title = "Mettre en pause";
+            }
+        }
+
+        function renderClockDots() {
+            const dotsContainer = document.getElementById('tzDots');
+            dotsContainer.innerHTML = TIMEZONES.map((_, idx) => `
+                <button onclick="selectTimezone(${idx})" class="w-1.5 h-1.5 rounded-full transition-all ${idx === currentTzIdx ? 'bg-amber-400 w-3' : 'bg-slate-700 hover:bg-slate-500'}"></button>
+            `).join('');
+        }
+
+        function selectTimezone(idx) {
+            if (idx === currentTzIdx) return;
+            currentTzIdx = idx;
+            triggerClockTransition();
+            startClockRotation();
+        }
+
+        function nextTimezone(manual = true) {
+            currentTzIdx = (currentTzIdx + 1) % TIMEZONES.length;
+            triggerClockTransition();
+            if (manual) startClockRotation();
+        }
+
+        function prevTimezone() {
+            currentTzIdx = (currentTzIdx - 1 + TIMEZONES.length) % TIMEZONES.length;
+            triggerClockTransition();
+            startClockRotation();
+        }
+
+        function triggerClockTransition() {
+            const container = document.getElementById('clockContainer');
+            container.classList.remove('clock-fade-active');
+            container.classList.add('clock-fade-exit');
+
+            setTimeout(() => {
+                updateClockDisplay();
+                renderClockDots();
+                container.classList.remove('clock-fade-exit');
+                container.classList.add('clock-fade-enter');
+
+                requestAnimationFrame(() => {
+                    requestAnimationFrame(() => {
+                        container.classList.remove('clock-fade-enter');
+                        container.classList.add('clock-fade-active');
+                    });
+                });
+            }, 250);
+        }
+
+        function updateClockDisplay() {
+            const tz = TIMEZONES[currentTzIdx];
+            const now = new Date();
+
+            const timeFormatter = new Intl.DateTimeFormat('fr-FR', {
+                timeZone: tz.zone,
+                hour: '2-digit',
+                minute: '2-digit',
+                second: '2-digit',
+                hour12: false
+            });
+
+            const dateFormatter = new Intl.DateTimeFormat('fr-FR', {
+                timeZone: tz.zone,
+                weekday: 'short',
+                day: '2-digit',
+                month: 'short',
+                year: 'numeric'
+            });
+
+            // Calculate precise UTC offset
+            const nowInTz = new Date(now.toLocaleString('en-US', { timeZone: tz.zone }));
+            const nowInUtc = new Date(now.toLocaleString('en-US', { timeZone: 'UTC' }));
+            const offsetDiff = Math.round((nowInTz - nowInUtc) / (1000 * 60 * 60));
+            const offsetStr = `UTC${offsetDiff >= 0 ? '+' : ''}${offsetDiff}`;
+
+            document.getElementById('tzFlag').innerText = tz.flag;
+            
+            const cityEl = document.getElementById('tzCity');
+            cityEl.innerText = tz.city;
+            cityEl.className = `text-xs font-bold tracking-wide uppercase font-mono ${tz.textColor}`;
+
+            const badgeEl = document.getElementById('tzBadge');
+            badgeEl.innerText = tz.badge;
+            badgeEl.className = `text-[9px] font-mono px-1.5 py-0.2 rounded border ${tz.badgeStyle}`;
+
+            document.getElementById('tzDate').innerText = dateFormatter.format(now);
+            document.getElementById('tzTime').innerText = timeFormatter.format(now);
+            document.getElementById('tzOffset').innerText = offsetStr;
+        }
+
+        // 5. CARDS & HUB LOGIC
+        function saveState() {
+            localStorage.setItem('ares_hub_cards_local', JSON.stringify(cardsData));
+        }
+
+        function renderAllCards() {
+            const categories = ['world', 'opsec', 'indice'];
+
+            categories.forEach(cat => {
+                const container = document.getElementById(`grid-${cat}`);
+                const items = cardsData.filter(c => c.category === cat);
+                document.getElementById(`count-${cat}`).innerText = `${items.length} module${items.length > 1 ? 's' : ''}`;
+
+                container.innerHTML = items.map(card => createCardHTML(card)).join('');
+            });
+
+            filterCards();
+        }
+
+        function createCardHTML(card) {
+            let statusColor = "bg-emerald-500/10 text-emerald-400 border-emerald-500/30";
+            if(card.status === "Tunnel Actif") statusColor = "bg-cyan-500/10 text-cyan-300 border-cyan-500/30";
+            if(card.status === "Local Ready") statusColor = "bg-amber-500/10 text-amber-300 border-amber-500/30";
+            if(card.status === "Maintenance") statusColor = "bg-rose-500/10 text-rose-400 border-rose-500/30";
+            if(card.status === "Securisé") statusColor = "bg-blue-500/10 text-blue-300 border-blue-500/30";
+
+            let categoryGlow = "hover:border-amber-500/40";
+            let iconBg = "bg-amber-500/10 text-amber-400 border-amber-500/20";
+            if (card.category === 'opsec') {
+                categoryGlow = "hover:border-cyan-500/40";
+                iconBg = "bg-cyan-500/10 text-cyan-400 border-cyan-500/20";
+            } else if (card.category === 'indice') {
+                categoryGlow = "hover:border-emerald-500/40";
+                iconBg = "bg-emerald-500/10 text-emerald-400 border-emerald-500/20";
+            }
+
+            return `
+                <div class="card-item glass-panel glass-panel-hover rounded-2xl p-5 flex flex-col justify-between border relative group ${categoryGlow}" data-title="${card.title.toLowerCase()}" data-desc="${card.description.toLowerCase()}" data-url="${card.url.toLowerCase()}">
+                    <div>
+                        <div class="flex items-start justify-between gap-3 mb-3">
+                            <div class="p-3 rounded-xl ${iconBg} border transition-transform group-hover:scale-105">
+                                <i class="${card.icon} text-lg"></i>
+                            </div>
+                            <div class="flex items-center gap-2">
+                                <span class="px-2 py-0.5 rounded-full text-[10px] font-mono border ${statusColor}">
+                                    ${card.status}
+                                </span>
+                                <button onclick="openEditModal('${card.id}')" title="Éditer la carte/URL" class="opacity-0 group-hover:opacity-100 p-1.5 text-slate-400 hover:text-white rounded-lg hover:bg-slate-800 transition-all">
+                                    <i class="fa-solid fa-pen-to-square text-xs"></i>
+                                </button>
+                            </div>
+                        </div>
+
+                        <h3 class="font-bold text-white text-base tracking-wide group-hover:text-amber-400 transition-colors">
+                            <a href="${card.url}" class="hover:underline">${card.title}</a>
+                        </h3>
+                        <p class="text-slate-400 text-xs mt-2 leading-relaxed">
+                            ${card.description}
+                        </p>
+                    </div>
+
+                    <div class="mt-5 pt-4 border-t border-slate-800/80 flex items-center justify-between">
+                        <span class="text-[10px] font-mono text-slate-500 truncate max-w-[170px]" title="${card.url}">
+                            ${card.url.replace('https://', '').replace('http://', '')}
+                        </span>
+                        <div class="flex items-center gap-2">
+                            <a href="${card.url}" title="Ouvrir dans cet onglet" class="px-2.5 py-1 bg-slate-800/80 hover:bg-slate-700 text-slate-300 rounded text-[11px] font-mono transition-colors">
+                                <i class="fa-solid fa-location-arrow"></i>
+                            </a>
+                            <a href="${card.url}" target="_blank" rel="noopener noreferrer" title="Ouvrir dans un nouvel onglet" class="px-2.5 py-1 bg-amber-500/20 hover:bg-amber-500/30 text-amber-300 border border-amber-500/30 rounded text-[11px] font-mono transition-colors flex items-center gap-1">
+                                <span>Lancer</span>
+                                <i class="fa-solid fa-arrow-up-right-from-square text-[9px]"></i>
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            `;
+        }
+
+        // 6. SEARCH & FILTERING
+        function filterCards() {
+            const query = document.getElementById('searchInput').value.toLowerCase().trim();
+            const clearBtn = document.getElementById('clearSearchBtn');
+            const cards = document.querySelectorAll('.card-item');
+            let visibleCount = 0;
+
+            if (query.length > 0) {
+                clearBtn.classList.remove('hidden');
+            } else {
+                clearBtn.classList.add('hidden');
+            }
+
+            cards.forEach(card => {
+                const title = card.getAttribute('data-title');
+                const desc = card.getAttribute('data-desc');
+                const url = card.getAttribute('data-url');
+
+                if (title.includes(query) || desc.includes(query) || url.includes(query)) {
+                    card.classList.remove('hidden');
+                    visibleCount++;
+                } else {
+                    card.classList.add('hidden');
+                }
+            });
+
+            document.querySelectorAll('.category-section').forEach(sec => {
+                const visibleInCat = sec.querySelectorAll('.card-item:not(.hidden)').length;
+                if(visibleInCat === 0 && query.length > 0) {
+                    sec.classList.add('hidden');
+                } else {
+                    sec.classList.remove('hidden');
+                }
+            });
+
+            const noResults = document.getElementById('noResults');
+            if (visibleCount === 0 && query.length > 0) {
+                noResults.classList.remove('hidden');
+            } else {
+                noResults.classList.add('hidden');
+            }
+        }
+
+        function clearSearch() {
+            document.getElementById('searchInput').value = '';
+            filterCards();
+        }
+
+        // 7. MODALS & CARD MANAGEMENT
+        function openEditModal(cardId) {
+            const card = cardsData.find(c => c.id === cardId);
+            if (!card) return;
+
+            document.getElementById('modalTitle').innerText = "Éditer l'outil";
+            document.getElementById('cardId').value = card.id;
+            document.getElementById('cardTitle').value = card.title;
+            document.getElementById('cardCategory').value = card.category;
+            document.getElementById('cardUrl').value = card.url;
+            document.getElementById('cardDescription').value = card.description;
+            document.getElementById('cardStatus').value = card.status;
+            document.getElementById('cardIcon').value = card.icon;
+
+            document.getElementById('deleteCardBtn').classList.remove('hidden');
+            document.getElementById('editModal').classList.remove('hidden');
+        }
+
+        function openAddModal() {
+            document.getElementById('modalTitle').innerText = "Ajouter un nouvel outil local/web";
+            document.getElementById('cardForm').reset();
+            document.getElementById('cardId').value = '';
+            document.getElementById('cardIcon').value = 'fa-solid fa-server';
+
+            document.getElementById('deleteCardBtn').classList.add('hidden');
+            document.getElementById('editModal').classList.remove('hidden');
+        }
+
+        function closeModal() {
+            document.getElementById('editModal').classList.add('hidden');
+        }
+
+        function saveCardData(event) {
+            event.preventDefault();
+
+            const id = document.getElementById('cardId').value;
+            const title = document.getElementById('cardTitle').value;
+            const category = document.getElementById('cardCategory').value;
+            let url = document.getElementById('cardUrl').value.trim();
+            const description = document.getElementById('cardDescription').value;
+            const status = document.getElementById('cardStatus').value;
+            const icon = document.getElementById('cardIcon').value;
+
+            // Ensure valid protocol prefix if missing
+            if (!url.startsWith('http://') && !url.startsWith('https://') && !url.startsWith('file://')) {
+                url = 'http://' + url;
+            }
+
+            if (id) {
+                const index = cardsData.findIndex(c => c.id === id);
+                if (index !== -1) {
+                    cardsData[index] = { ...cardsData[index], title, category, url, description, status, icon };
+                }
+            } else {
+                const newCard = {
+                    id: 'local-' + Date.now(),
+                    title,
+                    category,
+                    url,
+                    description,
+                    status,
+                    icon
+                };
+                cardsData.push(newCard);
+            }
+
+            saveState();
+            renderAllCards();
+            closeModal();
+            showToast('Outil et URL enregistrés.');
+        }
+
+        function deleteCurrentCard() {
+            const id = document.getElementById('cardId').value;
+            if (!id) return;
+
+            cardsData = cardsData.filter(c => c.id !== id);
+            saveState();
+            renderAllCards();
+            closeModal();
+            showToast('Outil supprimé du hub.');
+        }
+
+        function exportConfig() {
+            const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(cardsData, null, 2));
+            const downloadAnchor = document.createElement('a');
+            downloadAnchor.setAttribute("href", dataStr);
+            downloadAnchor.setAttribute("download", `ares_local_hub_config_${new Date().toISOString().slice(0,10)}.json`);
+            document.body.appendChild(downloadAnchor);
+            downloadAnchor.click();
+            downloadAnchor.remove();
+            showToast('Configuration exportée au format JSON.');
+        }
+
+        function importConfig(event) {
+            const fileReader = new FileReader();
+            fileReader.onload = function(e) {
+                try {
+                    const parsed = JSON.parse(e.target.result);
+                    if (Array.isArray(parsed)) {
+                        cardsData = parsed;
+                        saveState();
+                        renderAllCards();
+                        showToast('Configuration importée avec succès.');
+                    } else {
+                        alert('Format de fichier JSON invalide.');
+                    }
+                } catch (err) {
+                    alert('Erreur lors de la lecture du fichier JSON.');
+                }
+            };
+            fileReader.readAsText(event.target.files[0]);
+        }
+
+        function resetToDefaults() {
+            cardsData = [...DEFAULT_CARDS];
+            saveState();
+            renderAllCards();
+            showToast('URLs réinitialisées aux valeurs par défaut.');
+        }
+
+        function showToast(msg) {
+            const toast = document.getElementById('toast');
+            document.getElementById('toastMessage').innerText = msg;
+            toast.classList.remove('translate-y-20', 'opacity-0');
+            
+            setTimeout(() => {
+                toast.classList.add('translate-y-20', 'opacity-0');
+            }, 3000);
+        }
+
+        // Initialize App on Window Load
+        window.onload = initApp;
+    </script>
+</body>
+</html>
