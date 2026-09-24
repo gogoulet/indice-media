@@ -3,12 +3,21 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ARES // Portal Exécutif Local</title>
+    <title>INDICE PUBLIC // Intelligence Média & Opinion Publique</title>
     
     <!-- Tailwind CSS CDN -->
     <script src="https://cdn.tailwindcss.com"></script>
     
-    <!-- Custom Tailwind Theme Setup -->
+    <!-- Chart.js for Interactive Charts -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+    <!-- Google Fonts & FontAwesome -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <!-- Custom Tailwind Configuration -->
     <script>
         tailwind.config = {
             darkMode: 'class',
@@ -23,7 +32,8 @@
                             goldHover: '#F5C242',
                             cyan: '#06B6D4',
                             emerald: '#10B981',
-                            rose: '#F43F5E'
+                            rose: '#F43F5E',
+                            amber: '#F59E0B'
                         }
                     },
                     fontFamily: {
@@ -35,25 +45,19 @@
         }
     </script>
 
-    <!-- Google Fonts & FontAwesome -->
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-
-    <!-- CSS Styling for Visual Aesthetics -->
+    <!-- Custom Glassmorphism & Aesthetics -->
     <style>
         body {
             background-color: #05070b;
             background-image: 
-                radial-gradient(at 0% 0%, rgba(212, 175, 55, 0.07) 0px, transparent 50%),
-                radial-gradient(at 100% 0%, rgba(6, 182, 212, 0.06) 0px, transparent 50%),
-                radial-gradient(at 50% 100%, rgba(16, 185, 129, 0.05) 0px, transparent 50%);
+                radial-gradient(at 0% 0%, rgba(212, 175, 55, 0.08) 0px, transparent 45%),
+                radial-gradient(at 100% 0%, rgba(16, 185, 129, 0.06) 0px, transparent 45%),
+                radial-gradient(at 50% 100%, rgba(6, 182, 212, 0.05) 0px, transparent 50%);
             background-attachment: fixed;
         }
 
         .glass-panel {
-            background: rgba(12, 16, 23, 0.75);
+            background: rgba(12, 16, 23, 0.80);
             backdrop-filter: blur(16px);
             -webkit-backdrop-filter: blur(16px);
             border: 1px solid rgba(255, 255, 255, 0.08);
@@ -64,10 +68,10 @@
         }
 
         .glass-panel-hover:hover {
-            transform: translateY(-3px);
-            background: rgba(22, 30, 46, 0.85);
-            border-color: rgba(212, 175, 55, 0.3);
-            box-shadow: 0 15px 35px -10px rgba(0, 0, 0, 0.6), 0 0 20px 0 rgba(212, 175, 55, 0.12);
+            transform: translateY(-2px);
+            background: rgba(20, 27, 40, 0.88);
+            border-color: rgba(212, 175, 55, 0.35);
+            box-shadow: 0 12px 30px -10px rgba(0, 0, 0, 0.7), 0 0 18px 0 rgba(212, 175, 55, 0.1);
         }
 
         .pulse-status {
@@ -77,29 +81,14 @@
 
         @keyframes pulse-status {
             0% { box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.6); }
-            70% { box-shadow: 0 0 0 7px rgba(16, 185, 129, 0); }
+            70% { box-shadow: 0 0 0 8px rgba(16, 185, 129, 0); }
             100% { box-shadow: 0 0 0 0 rgba(16, 185, 129, 0); }
         }
 
-        /* Smooth Clock Transition */
-        .clock-fade-enter {
-            opacity: 0;
-            transform: translateY(-4px) scale(0.98);
-        }
-        .clock-fade-active {
-            opacity: 1;
-            transform: translateY(0) scale(1);
-            transition: opacity 0.35s cubic-bezier(0.16, 1, 0.3, 1), transform 0.35s cubic-bezier(0.16, 1, 0.3, 1);
-        }
-        .clock-fade-exit {
-            opacity: 0;
-            transform: translateY(4px) scale(0.98);
-            transition: opacity 0.25s ease-in, transform 0.25s ease-in;
-        }
-
-        /* Custom Scrollbar */
+        /* Custom Scrollbars */
         ::-webkit-scrollbar {
-            width: 8px;
+            width: 6px;
+            height: 6px;
         }
         ::-webkit-scrollbar-track {
             background: #05070b;
@@ -109,865 +98,879 @@
             border-radius: 4px;
         }
         ::-webkit-scrollbar-thumb:hover {
-            background: #2d3a54;
+            background: #D4AF37;
+        }
+
+        /* Loading Spinner */
+        .loader {
+            border: 3px solid rgba(212, 175, 55, 0.1);
+            border-top: 3px solid #D4AF37;
+            border-radius: 50%;
+            width: 24px;
+            height: 24px;
+            animation: spin 0.8s linear infinite;
+        }
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
         }
     </style>
 </head>
+
 <body class="text-slate-200 font-sans min-h-screen flex flex-col justify-between antialiased selection:bg-amber-500/30 selection:text-amber-200">
 
-    <!-- HEADER -->
-    <header class="border-b border-slate-800/80 glass-panel sticky top-0 z-40 px-4 lg:px-8 py-3">
-        <div class="max-w-7xl mx-auto flex flex-col lg:flex-row items-center justify-between gap-4">
+    <!-- HEADER INSTITUTIONNEL -->
+    <header class="border-b border-slate-800/80 glass-panel sticky top-0 z-40 px-4 lg:px-8 py-3.5">
+        <div class="max-w-7xl mx-auto flex flex-col md:flex-row items-center justify-between gap-4">
             
-            <!-- Brand & Status -->
-            <div class="flex items-center gap-4 w-full lg:w-auto justify-between lg:justify-start">
+            <!-- Logo & Brand -->
+            <div class="flex items-center gap-4 w-full md:w-auto justify-between md:justify-start">
                 <div class="flex items-center gap-3">
                     <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-amber-400 via-amber-600 to-amber-700 flex items-center justify-center text-slate-950 font-bold shadow-lg shadow-amber-500/20 border border-amber-300/40">
-                        <i class="fa-solid font-mono text-xl text-slate-950">A</i>
+                        <i class="fa-solid fa-scale-balanced text-lg text-slate-950"></i>
                     </div>
                     <div>
                         <div class="flex items-center gap-2">
-                            <h1 class="font-bold text-lg tracking-wider text-white font-mono uppercase">Ares // Local Hub</h1>
-                            <span class="bg-amber-500/10 text-amber-400 border border-amber-500/30 text-[10px] font-mono px-2 py-0.5 rounded font-semibold uppercase">Localhost v3.8</span>
+                            <h1 class="font-bold text-lg tracking-wider text-white font-mono uppercase">Indice Public</h1>
+                            <span class="bg-amber-500/10 text-amber-400 border border-amber-500/30 text-[10px] font-mono px-2 py-0.5 rounded font-semibold uppercase">Analytique IA</span>
                         </div>
-                        <p class="text-xs text-slate-400 font-mono">PORTAIL DE REDIRECTION ET D'OUTILS</p>
+                        <p class="text-[11px] text-slate-400 font-mono">INTELLIGENCE MÉDIA & VEILLE STRATÉGIQUE</p>
                     </div>
                 </div>
 
-                <!-- Global Status Indicator (Mobile) -->
-                <div class="flex lg:hidden items-center gap-2 bg-emerald-950/40 border border-emerald-500/30 px-3 py-1 rounded-full">
+                <!-- Status live mobile/desktop -->
+                <div class="flex items-center gap-2 bg-emerald-950/40 border border-emerald-500/30 px-3 py-1 rounded-full">
                     <span class="w-2 h-2 rounded-full bg-emerald-500 pulse-status"></span>
-                    <span class="text-[11px] font-mono text-emerald-400 font-medium">LOCAL READY</span>
+                    <span class="text-[10px] font-mono text-emerald-400 font-medium">VEILLE EN DIRECT</span>
                 </div>
             </div>
 
-            <!-- Central Live Search -->
-            <div class="w-full lg:max-w-md relative">
-                <i class="fa-solid fa-magnifying-glass absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400 text-sm"></i>
-                <input type="text" id="searchInput" oninput="filterCards()" placeholder="Rechercher un outil, IP local, ou sous-système..." 
-                       class="w-full pl-10 pr-10 py-2 bg-slate-900/90 border border-slate-700/80 rounded-xl text-sm text-slate-200 placeholder-slate-500 focus:outline-none focus:border-amber-500/60 focus:ring-1 focus:ring-amber-500/40 transition-all">
-                <button onclick="clearSearch()" id="clearSearchBtn" class="hidden absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-white text-xs">
-                    <i class="fa-solid fa-xmark"></i>
+            <!-- Actions Header -->
+            <div class="flex items-center gap-3 w-full md:w-auto justify-end">
+                <button onclick="generateGeminiBriefing()" class="px-3.5 py-2 bg-gradient-to-r from-amber-500/20 to-amber-600/30 hover:from-amber-500/30 hover:to-amber-600/40 text-amber-300 border border-amber-500/40 rounded-xl text-xs font-mono font-semibold flex items-center gap-2 transition-all shadow-lg shadow-amber-500/10 group">
+                    <i class="fa-solid fa-wand-magic-sparkles text-amber-400 group-hover:rotate-12 transition-transform"></i>
+                    <span>Synthèse IA Décideurs</span>
                 </button>
-            </div>
-
-            <!-- MULTI-TIMEZONE ROTATING CLOCK WIDGET -->
-            <div id="clockWidgetContainer" onmouseenter="pauseClockRotation()" onmouseleave="resumeClockRotation()" 
-                 class="w-full lg:w-auto flex items-center justify-between lg:justify-end gap-3 bg-slate-900/90 border border-slate-800 p-2 px-3 rounded-xl shadow-inner relative group transition-all">
                 
-                <!-- Local Status dot -->
-                <div class="hidden sm:flex items-center gap-2 pr-3 border-r border-slate-800/80">
-                    <span class="w-2 h-2 rounded-full bg-emerald-500 pulse-status"></span>
-                    <span class="text-[10px] font-mono text-slate-400 font-semibold tracking-wider uppercase">LOCAL // OK</span>
-                </div>
+                <button onclick="exportDataReport()" class="px-3 py-2 bg-slate-900/90 hover:bg-slate-800 text-slate-300 border border-slate-700/80 rounded-xl text-xs font-mono transition-all flex items-center gap-2">
+                    <i class="fa-solid fa-download text-slate-400"></i>
+                    <span class="hidden sm:inline">Exporter</span>
+                </button>
 
-                <!-- Clock Display Card -->
-                <div id="clockContainer" class="flex items-center gap-3 min-w-[245px] justify-between clock-fade-active">
-                    <div class="flex items-center gap-2.5">
-                        <span id="tzFlag" class="text-xl leading-none select-none">🇨🇦</span>
-                        <div class="flex flex-col">
-                            <div class="flex items-center gap-1.5">
-                                <span id="tzCity" class="text-xs font-bold tracking-wide uppercase font-mono text-amber-400">Toronto</span>
-                                <span id="tzBadge" class="text-[9px] font-mono px-1.5 py-0.2 rounded border bg-amber-500/10 text-amber-300 border-amber-500/30">EST</span>
-                            </div>
-                            <span id="tzDate" class="text-[10px] text-slate-400 font-mono tracking-tight">Mer. 23 Sep 2026</span>
-                        </div>
-                    </div>
-
-                    <div class="text-right pl-2">
-                        <div id="tzTime" class="font-mono text-sm font-bold text-slate-100 tracking-wider">15:48:29</div>
-                        <div id="tzOffset" class="text-[9px] font-mono text-slate-500">UTC-4</div>
-                    </div>
-                </div>
-
-                <!-- Clock Controls & Rotation State -->
-                <div class="flex items-center gap-1 pl-2 border-l border-slate-800">
-                    <button onclick="prevTimezone()" title="Ville précédente" class="p-1 text-slate-500 hover:text-slate-200 transition-colors rounded hover:bg-slate-800 text-xs">
-                        <i class="fa-solid fa-chevron-left"></i>
-                    </button>
-                    <button id="pausePlayBtn" onclick="toggleClockPause()" title="Mettre en pause / Reprendre" class="p-1 text-slate-500 hover:text-slate-200 transition-colors rounded hover:bg-slate-800 text-xs">
-                        <i class="fa-solid fa-pause"></i>
-                    </button>
-                    <button onclick="nextTimezone()" title="Ville suivante" class="p-1 text-slate-500 hover:text-slate-200 transition-colors rounded hover:bg-slate-800 text-xs">
-                        <i class="fa-solid fa-chevron-right"></i>
-                    </button>
-                </div>
-
-                <!-- Dots indicator -->
-                <div id="tzDots" class="absolute -bottom-1.5 left-1/2 -translate-x-1/2 flex items-center gap-1">
-                    <!-- Dots dynamically generated -->
+                <div class="text-right pl-3 border-l border-slate-800 hidden lg:block">
+                    <div id="liveClock" class="font-mono text-xs font-bold text-slate-200">18:15:00 UTC</div>
+                    <div class="text-[9px] font-mono text-slate-500 uppercase">Mise à jour automatique</div>
                 </div>
             </div>
 
         </div>
     </header>
 
-    <!-- MAIN HUB CONTAINER -->
-    <main class="max-w-7xl mx-auto px-4 lg:px-8 py-8 flex-grow w-full space-y-10">
+    <!-- CONTAINER PRINCIPAL -->
+    <main class="max-w-7xl mx-auto px-4 lg:px-8 py-6 flex-grow w-full space-y-6">
 
-        <!-- CATEGORY 1: ARES WORLD -->
-        <section class="category-section" data-category="world">
-            <div class="flex items-center justify-between mb-5 border-b border-slate-800/80 pb-3">
-                <div class="flex items-center gap-3">
-                    <div class="p-2 rounded-lg bg-amber-500/10 text-amber-400 border border-amber-500/20">
-                        <i class="fa-solid fa-globe text-base"></i>
-                    </div>
-                    <div>
-                        <h2 class="text-lg font-semibold text-white tracking-wide uppercase font-mono">01 // Ares World</h2>
-                        <p class="text-xs text-slate-400">Holding & Stratégie Globale, Actifs et Données Centralisées</p>
-                    </div>
+        <!-- BARRE DE RECHERCHE & FILTRES STRATÉGIQUES -->
+        <section class="glass-panel p-4 rounded-2xl border border-slate-800 space-y-4">
+            <div class="flex flex-col lg:flex-row items-center gap-3">
+                
+                <!-- Search bar -->
+                <div class="relative w-full lg:flex-1">
+                    <i class="fa-solid fa-magnifying-glass absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400 text-sm"></i>
+                    <input type="text" id="searchInput" oninput="applyFilters()" placeholder="Rechercher par sujet d'intérêt public, mot-clé, ministre, loi..." 
+                           class="w-full pl-10 pr-10 py-2.5 bg-slate-900/90 border border-slate-700/80 rounded-xl text-sm text-slate-100 placeholder-slate-500 focus:outline-none focus:border-amber-500/60 focus:ring-1 focus:ring-amber-500/40 transition-all">
+                    <button onclick="clearSearch()" id="clearSearchBtn" class="hidden absolute right-3.5 top-1/2 -translate-y-1/2 text-slate-400 hover:text-white text-xs">
+                        <i class="fa-solid fa-xmark"></i>
+                    </button>
                 </div>
-                <span class="text-xs font-mono text-slate-500 font-medium" id="count-world">0 module</span>
-            </div>
 
-            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5" id="grid-world">
-                <!-- Dynamically populated via JS -->
+                <!-- Filters Group -->
+                <div class="flex flex-wrap items-center gap-2.5 w-full lg:w-auto">
+                    
+                    <!-- Période -->
+                    <div class="flex items-center gap-1.5 bg-slate-900/80 border border-slate-800 px-2.5 py-1.5 rounded-xl text-xs font-mono">
+                        <i class="fa-regular fa-calendar-check text-amber-400"></i>
+                        <select id="timeFilter" onchange="applyFilters()" class="bg-transparent text-slate-200 focus:outline-none cursor-pointer">
+                            <option value="all" class="bg-slate-900">Toutes les périodes</option>
+                            <option value="24h" class="bg-slate-900" selected>Dernières 24h</option>
+                            <option value="7d" class="bg-slate-900">7 derniers jours</option>
+                            <option value="30d" class="bg-slate-900">30 derniers jours</option>
+                        </select>
+                    </div>
+
+                    <!-- Canal / Source -->
+                    <div class="flex items-center gap-1.5 bg-slate-900/80 border border-slate-800 px-2.5 py-1.5 rounded-xl text-xs font-mono">
+                        <i class="fa-solid fa-satellite-dish text-cyan-400"></i>
+                        <select id="channelFilter" onchange="applyFilters()" class="bg-transparent text-slate-200 focus:outline-none cursor-pointer">
+                            <option value="all" class="bg-slate-900">Tous les canaux</option>
+                            <option value="presse_nationale" class="bg-slate-900">Presse Nationale</option>
+                            <option value="medias_regionaux" class="bg-slate-900">Médias Régionaux</option>
+                            <option value="twitter" class="bg-slate-900">X / Twitter</option>
+                            <option value="reddit" class="bg-slate-900">Reddit & Forums</option>
+                            <option value="parlement" class="bg-slate-900">Transcripts Parlementaires</option>
+                        </select>
+                    </div>
+
+                    <!-- Juridiction -->
+                    <div class="flex items-center gap-1.5 bg-slate-900/80 border border-slate-800 px-2.5 py-1.5 rounded-xl text-xs font-mono">
+                        <i class="fa-solid fa-earth-americas text-emerald-400"></i>
+                        <select id="jurisdictionFilter" onchange="applyFilters()" class="bg-transparent text-slate-200 focus:outline-none cursor-pointer">
+                            <option value="all" class="bg-slate-900">Toutes juridictions</option>
+                            <option value="ca_qc" class="bg-slate-900">Canada / Québec</option>
+                            <option value="usa" class="bg-slate-900">États-Unis</option>
+                            <option value="ue" class="bg-slate-900">Union Européenne</option>
+                            <option value="latam" class="bg-slate-900">Amérique Latine</option>
+                        </select>
+                    </div>
+
+                    <!-- Reset Filters -->
+                    <button onclick="resetAllFilters()" title="Réinitialiser" class="px-2.5 py-1.5 bg-slate-800 hover:bg-slate-700 text-slate-400 hover:text-white rounded-xl text-xs font-mono transition-all">
+                        <i class="fa-solid fa-arrow-rotate-left"></i>
+                    </button>
+
+                </div>
             </div>
         </section>
 
-        <!-- CATEGORY 2: ARES OPSEC -->
-        <section class="category-section" data-category="opsec">
-            <div class="flex items-center justify-between mb-5 border-b border-slate-800/80 pb-3">
-                <div class="flex items-center gap-3">
-                    <div class="p-2 rounded-lg bg-cyan-500/10 text-cyan-400 border border-cyan-500/20">
-                        <i class="fa-solid fa-shield-halved text-base"></i>
-                    </div>
+        <!-- CARTE KPIS & MÉTRIQUES CLÉS D'OPINION -->
+        <section class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+            
+            <!-- KPI 1 : Sentiment Global -->
+            <div class="glass-panel glass-panel-hover p-4 rounded-2xl border border-slate-800/80 relative overflow-hidden">
+                <div class="flex justify-between items-start">
                     <div>
-                        <h2 class="text-lg font-semibold text-white tracking-wide uppercase font-mono">02 // Ares OpSec</h2>
-                        <p class="text-xs text-slate-400">Sécurité Opérationnelle, Tunnels Réseaux & Coffres-Forts</p>
+                        <p class="text-[11px] font-mono text-slate-400 uppercase tracking-wider">Indice Sentiment Global</p>
+                        <h3 id="kpiSentiment" class="text-2xl font-bold font-mono text-emerald-400 mt-1">+64.8%</h3>
+                        <p class="text-[10px] text-emerald-400/90 font-mono mt-0.5 flex items-center gap-1">
+                            <i class="fa-solid fa-arrow-trend-up"></i> +4.2% vs hier
+                        </p>
+                    </div>
+                    <div class="p-2.5 bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 rounded-xl">
+                        <i class="fa-solid fa-face-smile text-lg"></i>
                     </div>
                 </div>
-                <span class="text-xs font-mono text-slate-500 font-medium" id="count-opsec">0 module</span>
+                <div class="w-full bg-slate-800 h-1.5 rounded-full mt-4 overflow-hidden flex">
+                    <div id="barPos" class="bg-emerald-500 h-full" style="width: 64.8%"></div>
+                    <div id="barNeu" class="bg-slate-500 h-full" style="width: 22.2%"></div>
+                    <div id="barNeg" class="bg-rose-500 h-full" style="width: 13.0%"></div>
+                </div>
             </div>
 
-            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5" id="grid-opsec">
-                <!-- Dynamically populated via JS -->
-            </div>
-        </section>
-
-        <!-- CATEGORY 3: INDICE PUBLIC -->
-        <section class="category-section" data-category="indice">
-            <div class="flex items-center justify-between mb-5 border-b border-slate-800/80 pb-3">
-                <div class="flex items-center gap-3">
-                    <div class="p-2 rounded-lg bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">
-                        <i class="fa-solid fa-building-columns text-base"></i>
-                    </div>
+            <!-- KPI 2 : Volume de Bruit Média -->
+            <div class="glass-panel glass-panel-hover p-4 rounded-2xl border border-slate-800/80 relative overflow-hidden">
+                <div class="flex justify-between items-start">
                     <div>
-                        <h2 class="text-lg font-semibold text-white tracking-wide uppercase font-mono">03 // Indice Public</h2>
-                        <p class="text-xs text-slate-400">Affaires Publiques, Intelligence Réglementaire & Analyse Média</p>
+                        <p class="text-[11px] font-mono text-slate-400 uppercase tracking-wider">Bruit Média (Mentions)</p>
+                        <h3 id="kpiVolume" class="text-2xl font-bold font-mono text-amber-400 mt-1">42,850</h3>
+                        <p class="text-[10px] text-amber-400/90 font-mono mt-0.5 flex items-center gap-1">
+                            <i class="fa-solid fa-bolt"></i> +18% hausse de vélocité
+                        </p>
+                    </div>
+                    <div class="p-2.5 bg-amber-500/10 text-amber-400 border border-amber-500/20 rounded-xl">
+                        <i class="fa-solid fa-bullhorn text-lg"></i>
                     </div>
                 </div>
-                <span class="text-xs font-mono text-slate-500 font-medium" id="count-indice">0 module</span>
+                <p class="text-[10px] text-slate-500 font-mono mt-4">Volume total capté sur 24h glissantes</p>
             </div>
 
-            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5" id="grid-indice">
-                <!-- Dynamically populated via JS -->
+            <!-- KPI 3 : Portée Estimée (Reach) -->
+            <div class="glass-panel glass-panel-hover p-4 rounded-2xl border border-slate-800/80 relative overflow-hidden">
+                <div class="flex justify-between items-start">
+                    <div>
+                        <p class="text-[11px] font-mono text-slate-400 uppercase tracking-wider">Portée Estimée (Reach)</p>
+                        <h3 id="kpiReach" class="text-2xl font-bold font-mono text-cyan-400 mt-1">3.42 M</h3>
+                        <p class="text-[10px] text-cyan-400/90 font-mono mt-0.5 flex items-center gap-1">
+                            <i class="fa-solid fa-users"></i> Auditorat unique estimé
+                        </p>
+                    </div>
+                    <div class="p-2.5 bg-cyan-500/10 text-cyan-400 border border-cyan-500/20 rounded-xl">
+                        <i class="fa-solid fa-eye text-lg"></i>
+                    </div>
+                </div>
+                <p class="text-[10px] text-slate-500 font-mono mt-4">Pénétration réseau & lectorat presse</p>
             </div>
+
+            <!-- KPI 4 : Risque Réputationnel -->
+            <div class="glass-panel glass-panel-hover p-4 rounded-2xl border border-slate-800/80 relative overflow-hidden">
+                <div class="flex justify-between items-start">
+                    <div>
+                        <p class="text-[11px] font-mono text-slate-400 uppercase tracking-wider">Indice de Controverses</p>
+                        <h3 id="kpiRisk" class="text-2xl font-bold font-mono text-rose-400 mt-1">Niveau 2 / 5</h3>
+                        <p class="text-[10px] text-emerald-400 font-mono mt-0.5 flex items-center gap-1">
+                            <i class="fa-solid fa-shield-check"></i> Risque modéré / Sous contrôle
+                        </p>
+                    </div>
+                    <div class="p-2.5 bg-rose-500/10 text-rose-400 border border-rose-500/20 rounded-xl">
+                        <i class="fa-solid fa-triangle-exclamation text-lg"></i>
+                    </div>
+                </div>
+                <p class="text-[10px] text-slate-500 font-mono mt-4">Détection précoce de débordement</p>
+            </div>
+
         </section>
 
-        <!-- No Search Results Container -->
-        <div id="noResults" class="hidden text-center py-16 glass-panel rounded-2xl border border-dashed border-slate-800">
-            <i class="fa-solid fa-folder-open text-4xl text-slate-600 mb-3"></i>
-            <h3 class="text-slate-300 font-semibold text-lg">Aucun outil ne correspond à votre recherche</h3>
-            <p class="text-slate-500 text-sm mt-1">Vérifiez les termes recherchés ou réinitialisez le filtre.</p>
-            <button onclick="clearSearch()" class="mt-4 px-4 py-2 bg-amber-500/20 hover:bg-amber-500/30 text-amber-300 text-xs font-mono rounded-lg border border-amber-500/30 transition-all">
-                Réinitialiser la recherche
-            </button>
+        <!-- GRID MODULES PRINCIPAUX -->
+        <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
+
+            <!-- MODULE 1 : REVUE DE PRESSE STRATÉGIQUE (8 Colonnes) -->
+            <section class="lg:col-span-7 xl:col-span-8 glass-panel p-5 rounded-2xl border border-slate-800 space-y-4 flex flex-col justify-between">
+                
+                <div class="flex items-center justify-between pb-3 border-b border-slate-800">
+                    <div class="flex items-center gap-3">
+                        <div class="p-2 rounded-lg bg-amber-500/10 text-amber-400 border border-amber-500/20">
+                            <i class="fa-solid fa-newspaper text-base"></i>
+                        </div>
+                        <div>
+                            <h2 class="text-base font-semibold text-white tracking-wide uppercase font-mono">01 // Revue de Presse Strategique</h2>
+                            <p class="text-xs text-slate-400">Analyse d'impact des signaux médias qualifiés par l'IA</p>
+                        </div>
+                    </div>
+                    <span id="articleCountBadge" class="text-xs font-mono px-2.5 py-1 rounded-full bg-slate-800 text-amber-400 border border-slate-700">6 articles</span>
+                </div>
+
+                <!-- Articles Stream Container -->
+                <div id="articlesStream" class="space-y-3.5 max-h-[640px] overflow-y-auto pr-1">
+                    <!-- Dynamic Content Inserted by JS -->
+                </div>
+
+            </section>
+
+            <!-- MODULE 2 : ÉCOUTE DES RÉSEAUX & TENDANCES (4 Colonnes) -->
+            <section class="lg:col-span-5 xl:col-span-4 space-y-6">
+                
+                <!-- Distribution du Sentiment par Canal (Chart.js) -->
+                <div class="glass-panel p-5 rounded-2xl border border-slate-800 space-y-4">
+                    <div class="flex items-center justify-between pb-3 border-b border-slate-800">
+                        <div class="flex items-center gap-2.5">
+                            <div class="p-2 rounded-lg bg-cyan-500/10 text-cyan-400 border border-cyan-500/20">
+                                <i class="fa-solid fa-chart-pie text-sm"></i>
+                            </div>
+                            <h2 class="text-sm font-semibold text-white tracking-wide uppercase font-mono">Volume par Canal</h2>
+                        </div>
+                        <span class="text-[10px] font-mono text-slate-500">24H LIVE</span>
+                    </div>
+
+                    <div class="relative h-48 flex items-center justify-center">
+                        <canvas id="channelChart"></canvas>
+                    </div>
+                </div>
+
+                <!-- Sujets Émergents & Vélocité des Mots-Clés -->
+                <div class="glass-panel p-5 rounded-2xl border border-slate-800 space-y-4">
+                    <div class="flex items-center justify-between pb-3 border-b border-slate-800">
+                        <div class="flex items-center gap-2.5">
+                            <div class="p-2 rounded-lg bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">
+                                <i class="fa-solid fa-arrow-trend-up text-sm"></i>
+                            </div>
+                            <h2 class="text-sm font-semibold text-white tracking-wide uppercase font-mono">Mots-Clés Émergents</h2>
+                        </div>
+                        <span class="text-[10px] font-mono text-slate-500">VIRALITÉ</span>
+                    </div>
+
+                    <div class="flex flex-wrap gap-2" id="topicCloud">
+                        <!-- Dynamic Tags -->
+                    </div>
+                </div>
+
+                <!-- Sentiment par Plateforme -->
+                <div class="glass-panel p-5 rounded-2xl border border-slate-800 space-y-3">
+                    <h3 class="text-xs font-mono text-slate-400 uppercase tracking-wider">Tone-Check par Réseau</h3>
+                    <div class="space-y-2.5 text-xs font-mono" id="platformSentimentList">
+                        <!-- Dynamic Progress Bars -->
+                    </div>
+                </div>
+
+            </section>
+
         </div>
 
     </main>
 
-    <!-- FOOTER & ACTION BAR -->
-    <footer class="border-t border-slate-800/80 glass-panel py-6 px-4 lg:px-8 mt-12">
-        <div class="max-w-7xl mx-auto flex flex-col md:flex-row items-center justify-between gap-4">
-            
-            <!-- Quick Management Buttons -->
-            <div class="flex flex-wrap items-center justify-center md:justify-start gap-3">
-                <button onclick="openAddModal()" class="px-3.5 py-2 bg-amber-500/10 hover:bg-amber-500/20 text-amber-400 border border-amber-500/30 rounded-lg text-xs font-mono font-medium flex items-center gap-2 transition-all">
-                    <i class="fa-solid fa-plus"></i>
-                    <span>Ajouter un Outil</span>
-                </button>
-                <button onclick="exportConfig()" class="px-3.5 py-2 bg-slate-800/80 hover:bg-slate-700/80 text-slate-300 border border-slate-700/60 rounded-lg text-xs font-mono font-medium flex items-center gap-2 transition-all">
-                    <i class="fa-solid fa-download"></i>
-                    <span>Exporter (JSON)</span>
-                </button>
-                <label class="px-3.5 py-2 bg-slate-800/80 hover:bg-slate-700/80 text-slate-300 border border-slate-700/60 rounded-lg text-xs font-mono font-medium flex items-center gap-2 cursor-pointer transition-all">
-                    <i class="fa-solid fa-upload"></i>
-                    <span>Importer (JSON)</span>
-                    <input type="file" id="importFile" accept=".json" onchange="importConfig(event)" class="hidden">
-                </label>
-                <button onclick="resetToDefaults()" class="px-3.5 py-2 bg-slate-900 hover:bg-rose-950/40 text-slate-400 hover:text-rose-400 border border-slate-800 hover:border-rose-800/40 rounded-lg text-xs font-mono font-medium flex items-center gap-2 transition-all">
-                    <i class="fa-solid fa-rotate-left"></i>
-                    <span>Réinitialiser URLs</span>
-                </button>
+    <!-- FOOTER INSTITUTIONNEL -->
+    <footer class="border-t border-slate-800/80 glass-panel py-5 px-4 lg:px-8 mt-10">
+        <div class="max-w-7xl mx-auto flex flex-col md:flex-row items-center justify-between gap-4 text-xs font-mono text-slate-500">
+            <div class="flex items-center gap-3">
+                <span class="text-amber-400 font-bold">INDICE PUBLIC</span>
+                <span>// Organisme de Veille Réglementaire & Opinion</span>
             </div>
-
-            <div class="text-center md:text-right text-xs text-slate-500 font-mono">
-                &copy; GROUPE ARES // ENVIRONNEMENT DE PILOTAGE LOCAL
+            <div>
+                Système de Monitoring Média v4.2 // Protocole d'Analyse Opérationnelle
             </div>
-
         </div>
     </footer>
 
-    <!-- EDIT & ADD CARD MODAL -->
-    <div id="editModal" class="fixed inset-0 bg-slate-950/80 backdrop-blur-md z-50 flex items-center justify-center p-4 hidden">
-        <div class="glass-panel w-full max-w-lg rounded-2xl border border-slate-700/80 p-6 shadow-2xl relative">
+    <!-- MODAL DE DÉTAIL / ANALYSE APPROFONDIE ARTICLE -->
+    <div id="detailModal" class="fixed inset-0 bg-slate-950/80 backdrop-blur-md z-50 flex items-center justify-center p-4 hidden">
+        <div class="glass-panel w-full max-w-2xl rounded-2xl border border-slate-700 p-6 shadow-2xl relative space-y-5 max-h-[90vh] overflow-y-auto">
             
-            <div class="flex items-center justify-between pb-4 border-b border-slate-800">
-                <div class="flex items-center gap-2">
-                    <i class="fa-solid fa-sliders text-amber-400"></i>
-                    <h3 class="font-bold text-white font-mono uppercase text-sm" id="modalTitle">Configuration de l'outil</h3>
+            <div class="flex items-start justify-between pb-3 border-b border-slate-800">
+                <div>
+                    <span id="modalSourceBadge" class="text-[10px] font-mono uppercase px-2 py-0.5 rounded bg-amber-500/10 text-amber-400 border border-amber-500/30">Source</span>
+                    <h3 id="modalTitle" class="font-bold text-white text-lg mt-1 leading-snug">Titre du signal</h3>
                 </div>
-                <button onclick="closeModal()" class="text-slate-400 hover:text-white transition-colors">
+                <button onclick="closeDetailModal()" class="text-slate-400 hover:text-white p-1">
                     <i class="fa-solid fa-xmark text-lg"></i>
                 </button>
             </div>
 
-            <form id="cardForm" onsubmit="saveCardData(event)" class="space-y-4 mt-4">
-                <input type="hidden" id="cardId">
-
+            <div class="space-y-4 text-xs">
                 <div>
-                    <label class="block text-xs font-mono text-slate-400 uppercase mb-1">Nom du module / outil</label>
-                    <input type="text" id="cardTitle" required class="w-full px-3.5 py-2 bg-slate-900 border border-slate-700 rounded-lg text-sm text-white focus:outline-none focus:border-amber-500">
+                    <h4 class="font-mono text-amber-400 uppercase text-[11px] mb-1">Résumé Stratégique</h4>
+                    <p id="modalSummary" class="text-slate-300 leading-relaxed bg-slate-900/60 p-3 rounded-xl border border-slate-800">
+                        Résumé...
+                    </p>
                 </div>
 
-                <div>
-                    <label class="block text-xs font-mono text-slate-400 uppercase mb-1">Pôle ARES</label>
-                    <select id="cardCategory" required class="w-full px-3.5 py-2 bg-slate-900 border border-slate-700 rounded-lg text-sm text-white focus:outline-none focus:border-amber-500">
-                        <option value="world">Ares World (Holding & Strategy)</option>
-                        <option value="opsec">Ares OpSec (Security & Infrastructure)</option>
-                        <option value="indice">Indice Public (Governance & Public Affairs)</option>
-                    </select>
-                </div>
-
-                <div>
-                    <label class="block text-xs font-mono text-slate-400 uppercase mb-1">URL / Adresse d'accès (ex: http://localhost:8080 ou IP)</label>
-                    <input type="text" id="cardUrl" required placeholder="http://localhost:8080 ou http://192.168.1.50" class="w-full px-3.5 py-2 bg-slate-900 border border-slate-700 rounded-lg text-sm text-white focus:outline-none focus:border-amber-500 font-mono text-xs">
-                </div>
-
-                <div>
-                    <label class="block text-xs font-mono text-slate-400 uppercase mb-1">Description succincte</label>
-                    <input type="text" id="cardDescription" required class="w-full px-3.5 py-2 bg-slate-900 border border-slate-700 rounded-lg text-sm text-white focus:outline-none focus:border-amber-500">
-                </div>
-
-                <div class="grid grid-cols-2 gap-3">
-                    <div>
-                        <label class="block text-xs font-mono text-slate-400 uppercase mb-1">Statut du module</label>
-                        <select id="cardStatus" class="w-full px-3.5 py-2 bg-slate-900 border border-slate-700 rounded-lg text-sm text-white focus:outline-none focus:border-amber-500">
-                            <option value="Opérationnel">Opérationnel</option>
-                            <option value="Local Ready">Local Ready</option>
-                            <option value="Tunnel Actif">Tunnel Actif</option>
-                            <option value="Maintenance">Maintenance</option>
-                            <option value="Securisé">Sécurisé</option>
-                        </select>
+                <div class="grid grid-cols-2 gap-3 font-mono">
+                    <div class="bg-slate-900/60 p-3 rounded-xl border border-slate-800">
+                        <span class="text-slate-500 block text-[10px]">SCORE D'IMPACT D'OPINION</span>
+                        <span id="modalImpact" class="text-sm font-bold text-amber-400">8.5 / 10</span>
                     </div>
-                    <div>
-                        <label class="block text-xs font-mono text-slate-400 uppercase mb-1">Icône (FontAwesome)</label>
-                        <input type="text" id="cardIcon" placeholder="fa-solid fa-server" required class="w-full px-3.5 py-2 bg-slate-900 border border-slate-700 rounded-lg text-sm text-white focus:outline-none focus:border-amber-500 font-mono text-xs">
+                    <div class="bg-slate-900/60 p-3 rounded-xl border border-slate-800">
+                        <span class="text-slate-500 block text-[10px]">TENDANCE DE SENTIMENT</span>
+                        <span id="modalSentiment" class="text-sm font-bold text-emerald-400">Neutre / Favorable</span>
                     </div>
                 </div>
 
-                <div class="flex items-center justify-between pt-4 border-t border-slate-800 mt-6">
-                    <button type="button" id="deleteCardBtn" onclick="deleteCurrentCard()" class="px-4 py-2 bg-rose-950/40 hover:bg-rose-900/60 text-rose-300 border border-rose-800/40 rounded-lg text-xs font-mono transition-all hidden">
-                        Supprimer
+                <div>
+                    <h4 class="font-mono text-cyan-400 uppercase text-[11px] mb-1">Recommandation de Communication</h4>
+                    <div id="modalRecommendation" class="bg-cyan-950/20 border border-cyan-500/30 text-cyan-200 p-3.5 rounded-xl leading-relaxed">
+                        Recommandation...
+                    </div>
+                </div>
+            </div>
+
+            <div class="flex justify-end pt-3 border-t border-slate-800">
+                <button onclick="closeDetailModal()" class="px-4 py-2 bg-slate-800 hover:bg-slate-700 text-slate-200 rounded-xl text-xs font-mono transition-all">
+                    Fermer la vue
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODAL NOTE DE SYNTHÈSE GEMINI (IA) -->
+    <div id="briefingModal" class="fixed inset-0 bg-slate-950/85 backdrop-blur-md z-50 flex items-center justify-center p-4 hidden">
+        <div class="glass-panel w-full max-w-3xl rounded-2xl border border-amber-500/40 p-6 shadow-2xl relative space-y-5 max-h-[90vh] overflow-y-auto">
+            
+            <div class="flex items-center justify-between pb-3 border-b border-slate-800">
+                <div class="flex items-center gap-3">
+                    <div class="p-2.5 rounded-xl bg-amber-500/20 text-amber-400 border border-amber-500/40">
+                        <i class="fa-solid fa-wand-magic-sparkles text-lg"></i>
+                    </div>
+                    <div>
+                        <h3 class="font-bold text-white text-base font-mono uppercase tracking-wide">Note de Synthèse Décideurs // Gemini AI</h3>
+                        <p class="text-xs text-slate-400">Briefing exécutif d'analyse d'opinion et risques média</p>
+                    </div>
+                </div>
+                <button onclick="closeBriefingModal()" class="text-slate-400 hover:text-white p-1">
+                    <i class="fa-solid fa-xmark text-lg"></i>
+                </button>
+            </div>
+
+            <!-- Content Area for Briefing -->
+            <div id="briefingContent" class="space-y-4 text-xs">
+                <!-- Loader State or AI Generated Content -->
+                <div id="briefingLoader" class="flex flex-col items-center justify-center py-12 space-y-3">
+                    <div class="loader"></div>
+                    <p class="font-mono text-amber-400 text-xs animate-pulse">Génération de la note de synthèse stratégique via Gemini...</p>
+                    <p class="text-[11px] text-slate-500">Compilation du bruit média, signaux faibles et risques réputationnels</p>
+                </div>
+
+                <div id="briefingText" class="hidden space-y-4">
+                    <!-- Dynamic Briefing output -->
+                </div>
+            </div>
+
+            <div class="flex items-center justify-between pt-4 border-t border-slate-800 font-mono text-xs">
+                <span class="text-slate-500">Document confidentiel - Indice Public Intelligence</span>
+                <div class="flex gap-2">
+                    <button onclick="copyBriefingToClipboard()" class="px-3.5 py-2 bg-slate-800 hover:bg-slate-700 text-slate-200 rounded-xl transition-all flex items-center gap-1.5">
+                        <i class="fa-regular fa-copy"></i>
+                        <span>Copier</span>
                     </button>
-                    <div class="flex items-center gap-2 ml-auto">
-                        <button type="button" onclick="closeModal()" class="px-4 py-2 bg-slate-800 hover:bg-slate-700 text-slate-300 rounded-lg text-xs font-mono transition-all">
-                            Annuler
-                        </button>
-                        <button type="submit" class="px-4 py-2 bg-amber-500 hover:bg-amber-600 text-slate-950 font-bold rounded-lg text-xs font-mono transition-all shadow-lg shadow-amber-500/20">
-                            Enregistrer
-                        </button>
-                    </div>
+                    <button onclick="closeBriefingModal()" class="px-4 py-2 bg-amber-500 hover:bg-amber-600 text-slate-950 font-bold rounded-xl transition-all shadow-lg shadow-amber-500/20">
+                        Terminé
+                    </button>
                 </div>
-            </form>
+            </div>
 
         </div>
     </div>
 
-    <!-- NOTIFICATION TOAST -->
+    <!-- TOAST NOTIFICATION -->
     <div id="toast" class="fixed bottom-6 right-6 bg-slate-900 border border-amber-500/40 text-slate-200 px-4 py-3 rounded-xl shadow-2xl z-50 flex items-center gap-3 transform translate-y-20 opacity-0 transition-all duration-300">
         <i class="fa-solid fa-circle-check text-amber-400 text-lg"></i>
-        <span id="toastMessage" class="text-xs font-mono">Opération effectuée avec succès.</span>
+        <span id="toastMessage" class="text-xs font-mono">Opération réussie.</span>
     </div>
 
-    <!-- JAVASCRIPT LOGIC -->
+    <!-- JAVASCRIPT LOGIC & ENGINE -->
     <script>
-        // 1. TIMEZONE DATA & CAROUSEL CONFIGURATION
-        const TIMEZONES = [
+        // DATASETS INITIALIZATION
+        const ARTICLES_DATA = [
             {
-                city: 'Toronto',
-                flag: '🇨🇦',
-                zone: 'America/Toronto',
-                badge: 'EST/EDT',
-                textColor: 'text-amber-400',
-                badgeStyle: 'bg-amber-500/10 text-amber-300 border-amber-500/30'
+                id: 'art-1',
+                title: "Projet de Loi sur la Transition Énergétique : Débats houleux à l'Assemblée",
+                source: "Presse Nationale",
+                sourceName: "Le Devoir / Globe Policy",
+                timeAgo: "Il y a 35 min",
+                timeCategory: "24h",
+                channel: "presse_nationale",
+                jurisdiction: "ca_qc",
+                sentiment: "Critique",
+                sentimentScore: -0.4,
+                impactScore: 8.8,
+                summary: "Les syndicats et certains groupes d'affaires contestent la rapidité d'application des nouvelles normes carbone. L'opinion publique montre un clivage ville-région.",
+                topics: ["Énergie", "Législation", "Débat Public"],
+                recommendation: "Publication immédiate de la fiche d'impact économique modélisée pour rassurer les petites entreprises et clarifier les aides publiques.",
+                reach: "450K"
             },
             {
-                city: 'Roatán',
-                flag: '🇭🇳',
-                zone: 'America/Tegucigalpa',
-                badge: 'CST',
-                textColor: 'text-sky-400',
-                badgeStyle: 'bg-sky-500/10 text-sky-300 border-sky-500/30'
+                id: 'art-2',
+                title: "Sondage National : 68% des citoyens favorables au plan de modernisation des transports",
+                source: "Presse Nationale",
+                sourceName: "La Presse",
+                timeAgo: "Il y a 2h",
+                timeCategory: "24h",
+                channel: "presse_nationale",
+                jurisdiction: "ca_qc",
+                sentiment: "Positif",
+                sentimentScore: 0.8,
+                impactScore: 7.5,
+                summary: "Un soutien massif est constaté auprès des populations urbaines pour les investissements ferroviaires, malgré des réticences sur les coûts globaux.",
+                topics: ["Infrastructures", "Sondage", "Mobilite"],
+                recommendation: "Capitaliser sur l'adhésion populaire dans les prochaines interventions ministérielles tout en répondant à la rigueur budgétaire.",
+                reach: "820K"
             },
             {
-                city: 'Montevideo',
-                flag: '🇺🇾',
-                zone: 'America/Montevideo',
-                badge: 'UYT',
-                textColor: 'text-cyan-400',
-                badgeStyle: 'bg-cyan-500/10 text-cyan-300 border-cyan-500/30'
+                id: 'art-3',
+                title: "Comité Parlementaire sur la Cybersécurité Civile : Dépôt du rapport final",
+                source: "Transcripts Parlementaires",
+                sourceName: "Hansard / Journal Officiel",
+                timeAgo: "Il y a 4h",
+                timeCategory: "24h",
+                channel: "parlement",
+                jurisdiction: "ca_qc",
+                sentiment: "Neutre",
+                sentimentScore: 0.1,
+                impactScore: 6.2,
+                summary: "Le rapport recommande 12 mesures d'urgence pour protéger les données de santé des citoyens contre les attaques ransomwares.",
+                topics: ["Cybersécurité", "Données", "Parlement"],
+                recommendation: "Soutenir publiquement les 12 recommandations lors de la conférence de presse pour affirmer le leadership institutionnel.",
+                reach: "150K"
             },
             {
-                city: 'Buenos Aires',
-                flag: '🇦🇷',
-                zone: 'America/Argentina/Buenos_Aires',
-                badge: 'ART',
-                textColor: 'text-blue-400',
-                badgeStyle: 'bg-blue-500/10 text-blue-300 border-blue-500/30'
+                id: 'art-4',
+                title: "Flambée des discussions X/Twitter entourant les réformes fiscales locales",
+                source: "X / Twitter",
+                sourceName: "Analyse Flux Social",
+                timeAgo: "Il y a 5h",
+                timeCategory: "24h",
+                channel: "twitter",
+                jurisdiction: "ca_qc",
+                sentiment: "Critique",
+                sentimentScore: -0.6,
+                impactScore: 8.2,
+                summary: "Création massive du mot-clic #TaxeEquitable. La portée s'accélère parmi les leaders d'opinion et éditorialistes économiques.",
+                topics: ["Fiscalité", "Social Listening", "X Trend"],
+                recommendation: "Mettre en avant une infographie claire explicative montrant le gain net moyen par ménage.",
+                reach: "1.2M"
             },
             {
-                city: 'Edinburgh',
-                flag: '🏴󠁧󠁢󠁳󠁣󠁴󠁿',
-                zone: 'Europe/London',
-                badge: 'GMT/BST',
-                textColor: 'text-indigo-400',
-                badgeStyle: 'bg-indigo-500/10 text-indigo-300 border-indigo-500/30'
+                id: 'art-5',
+                title: "Dossier Médias Régionaux : Impact des tarifs de l'eau sur le secteur agricole",
+                source: "Médias Régionaux",
+                sourceName: "Le Nouvelliste & Courrier",
+                timeAgo: "Il y a 12h",
+                timeCategory: "24h",
+                channel: "medias_regionaux",
+                jurisdiction: "ca_qc",
+                sentiment: "Neutre",
+                sentimentScore: -0.1,
+                impactScore: 5.4,
+                summary: "Inquiétudes modérées exprimées par la fédération des producteurs. Les maires régionaux demandent une période de grâce.",
+                topics: ["Agriculture", "Eau", "Régions"],
+                recommendation: "Proposer un calendrier de concertation régionale dédié avec les représentants du milieu agricole.",
+                reach: "210K"
             },
             {
-                city: 'Mallorca',
-                flag: '🇪🇸',
-                zone: 'Europe/Madrid',
-                badge: 'CET/CEST',
-                textColor: 'text-yellow-400',
-                badgeStyle: 'bg-yellow-500/10 text-yellow-300 border-yellow-500/30'
-            },
-            {
-                city: 'Cortina',
-                flag: '🇮🇹',
-                zone: 'Europe/Rome',
-                badge: 'CET/CEST',
-                textColor: 'text-emerald-400',
-                badgeStyle: 'bg-emerald-500/10 text-emerald-300 border-emerald-500/30'
-            },
-            {
-                city: 'Singapore',
-                flag: '🇸🇬',
-                zone: 'Asia/Singapore',
-                badge: 'SGT',
-                textColor: 'text-rose-400',
-                badgeStyle: 'bg-rose-500/10 text-rose-300 border-rose-500/30'
+                id: 'art-6',
+                title: "Reddit / Forum Politique : Fil de discussion viral sur la transparence algorithmique des services publics",
+                source: "Reddit & Forums",
+                sourceName: "r/CanadaPublicAffairs",
+                timeAgo: "Il y a 18h",
+                timeCategory: "24h",
+                channel: "reddit",
+                jurisdiction: "ca_qc",
+                sentiment: "Positif",
+                sentimentScore: 0.5,
+                impactScore: 4.8,
+                summary: "Accueil très favorable de l'initiative d'audit open-source des algorithmes étatiques. La communauté tech salue l'effort.",
+                topics: ["IA", "Transparence", "Tech"],
+                recommendation: "Partager l'article dans la newsletter tech de l'organisation pour renforcer l'image d'innovation.",
+                reach: "380K"
             }
         ];
 
-        let currentTzIdx = 0;
-        let tzRotationTimer = null;
-        let isClockPaused = false;
-
-        // 2. DEFAULT CARDS DATA (SUITED FOR LOCAL / HYBRID HOSTE)
-        const DEFAULT_CARDS = [
-            // Pôle Ares World
-            {
-                id: 'world-1',
-                category: 'world',
-                title: 'Global Logistics & Routes Dashboard',
-                description: 'Suivi de la flotte, hubs logistiques régionaux et chaînes d\'approvisionnement.',
-                url: 'http://localhost:8080/logistics',
-                status: 'Opérationnel',
-                icon: 'fa-solid fa-route'
-            },
-            {
-                id: 'world-2',
-                category: 'world',
-                title: 'Central Data Store & Repositories',
-                description: 'Dépôts d\'archives, stockage de données stratégiques et sauvegarde d\'actifs.',
-                url: 'http://192.168.1.100:9000',
-                status: 'Local Ready',
-                icon: 'fa-solid fa-database'
-            },
-            {
-                id: 'world-3',
-                category: 'world',
-                title: 'Financial & Asset Holdings Overview',
-                description: 'Supervision des comptes d\'investissement, capitaux et gestion de portefeuille.',
-                url: 'http://localhost:3000/finance',
-                status: 'Opérationnel',
-                icon: 'fa-solid fa-chart-pie'
-            },
-
-            // Pôle Ares OpSec
-            {
-                id: 'opsec-1',
-                category: 'opsec',
-                title: 'Security Operations Center (SOC)',
-                description: 'Moniteur d\'alertes, détection d\'intrusions réseau et télémétrie des systèmes.',
-                url: 'http://localhost:5000/soc',
-                status: 'Securisé',
-                icon: 'fa-solid fa-shield-halved'
-            },
-            {
-                id: 'opsec-2',
-                category: 'opsec',
-                title: 'Network Tunnels & Gateways',
-                description: 'Gestionnaire de passerelles Cloudflared, tunnels VPN locaux et proxys d\'accès.',
-                url: 'http://127.0.0.1:8443',
-                status: 'Tunnel Actif',
-                icon: 'fa-solid fa-network-wired'
-            },
-            {
-                id: 'opsec-3',
-                category: 'opsec',
-                title: 'Encrypted Identity & Access Vault',
-                description: 'Gestionnaire de clés, coffre-fort d\'identifiants et certificats de sécurité.',
-                url: 'http://localhost:8000/vault',
-                status: 'Securisé',
-                icon: 'fa-solid fa-key'
-            },
-
-            // Pôle Indice Public
-            {
-                id: 'indice-1',
-                category: 'indice',
-                title: 'Public Policy & Regulatory Intelligence',
-                description: 'Veille législative, cartographie décisionnelle et suivi des réformes institutionnelles.',
-                url: 'http://localhost:4000/regulatory',
-                status: 'Opérationnel',
-                icon: 'fa-solid fa-scale-balanced'
-            },
-            {
-                id: 'indice-2',
-                category: 'indice',
-                title: 'Media & Communications Monitor',
-                description: 'Analyse d\'opinion publique, revue de presse stratégique et écoute des réseaux.',
-                url: 'http://localhost:4000/media',
-                status: 'Opérationnel',
-                icon: 'fa-solid fa-newspaper'
-            },
-            {
-                id: 'indice-3',
-                category: 'indice',
-                title: 'Strategic Analytics & Survey Hub',
-                description: 'Moteur de sondages internes, matrices d\'impact et rapports stratégiques.',
-                url: 'http://localhost:4000/analytics',
-                status: 'Opérationnel',
-                icon: 'fa-solid fa-chart-line'
-            }
+        const TOPICS_DATA = [
+            { text: "#TransitionEnergétique", velocity: "+45%", count: 12400, type: "amber" },
+            { text: "Loi Transparence IA", velocity: "+88%", count: 9800, type: "cyan" },
+            { text: "Finances Publiques", velocity: "+12%", count: 8300, type: "emerald" },
+            { text: "#TaxeEquitable", velocity: "+110%", count: 15600, type: "rose" },
+            { text: "Consultation Agricole", velocity: "+5%", count: 3200, type: "amber" },
+            { text: "Sécurité Données", velocity: "+22%", count: 6400, type: "cyan" }
         ];
 
-        let cardsData = [];
+        const PLATFORMS_SENTIMENT = [
+            { name: "Presse Nationale", pos: 60, neu: 25, neg: 15, icon: "fa-solid fa-newspaper" },
+            { name: "X / Twitter", pos: 35, neu: 20, neg: 45, icon: "fa-brands fa-x-twitter" },
+            { name: "Reddit & Forums", pos: 70, neu: 18, neg: 12, icon: "fa-brands fa-reddit-alien" },
+            { name: "Transcripts Parlement", pos: 50, neu: 40, neg: 10, icon: "fa-solid fa-building-columns" }
+        ];
 
-        // 3. INITIALIZATION
-        function initApp() {
-            const saved = localStorage.getItem('ares_hub_cards_local');
-            if (saved) {
-                try {
-                    cardsData = JSON.parse(saved);
-                } catch(e) {
-                    cardsData = [...DEFAULT_CARDS];
-                }
-            } else {
-                cardsData = [...DEFAULT_CARDS];
+        let filteredArticles = [...ARTICLES_DATA];
+        let channelChartInstance = null;
+
+        // INITIALIZATION
+        window.onload = function() {
+            initLiveClock();
+            renderArticles(filteredArticles);
+            renderTopicCloud();
+            renderPlatformSentiment();
+            initCharts();
+        };
+
+        // LIVE CLOCK
+        function initLiveClock() {
+            const updateClock = () => {
+                const now = new Date();
+                const timeStr = now.toUTCString().split(' ')[4] + ' UTC';
+                document.getElementById('liveClock').innerText = timeStr;
+            };
+            updateClock();
+            setInterval(updateClock, 1000);
+        }
+
+        // RENDER ARTICLES STREAM
+        function renderArticles(articles) {
+            const container = document.getElementById('articlesStream');
+            document.getElementById('articleCountBadge').innerText = `${articles.length} article${articles.length > 1 ? 's' : ''}`;
+
+            if (articles.length === 0) {
+                container.innerHTML = `
+                    <div class="text-center py-12 border border-dashed border-slate-800 rounded-xl">
+                        <i class="fa-solid fa-folder-open text-3xl text-slate-600 mb-2"></i>
+                        <p class="text-slate-400 font-mono text-xs">Aucun signal média ne correspond aux critères sélectionnés.</p>
+                        <button onclick="resetAllFilters()" class="mt-3 text-amber-400 text-xs font-mono underline hover:text-amber-300">Réinitialiser les filtres</button>
+                    </div>
+                `;
+                return;
             }
 
-            renderAllCards();
-            initClockWidget();
+            container.innerHTML = articles.map(art => {
+                let badgeStyle = "bg-emerald-500/10 text-emerald-400 border-emerald-500/30";
+                if (art.sentiment === "Critique") badgeStyle = "bg-rose-500/10 text-rose-400 border-rose-500/30";
+                if (art.sentiment === "Neutre") badgeStyle = "bg-slate-500/10 text-slate-300 border-slate-500/30";
+
+                return `
+                    <div class="p-4 rounded-xl bg-slate-900/60 border border-slate-800 hover:border-amber-500/30 transition-all space-y-2.5 group">
+                        <div class="flex items-center justify-between gap-2">
+                            <div class="flex items-center gap-2 font-mono text-[11px]">
+                                <span class="text-amber-400 font-semibold">${art.sourceName}</span>
+                                <span class="text-slate-600">•</span>
+                                <span class="text-slate-400">${art.timeAgo}</span>
+                            </div>
+                            <div class="flex items-center gap-2">
+                                <span class="px-2 py-0.5 rounded text-[10px] font-mono border ${badgeStyle}">
+                                    ${art.sentiment}
+                                </span>
+                                <span class="text-[10px] font-mono text-slate-400 bg-slate-800 px-2 py-0.5 rounded border border-slate-700">
+                                    Impact ${art.impactScore}/10
+                                </span>
+                            </div>
+                        </div>
+
+                        <h3 class="font-bold text-white text-sm group-hover:text-amber-300 transition-colors cursor-pointer" onclick="openDetailModal('${art.id}')">
+                            ${art.title}
+                        </h3>
+
+                        <p class="text-slate-300 text-xs leading-relaxed line-clamp-2">
+                            ${art.summary}
+                        </p>
+
+                        <div class="flex items-center justify-between pt-2 border-t border-slate-800/80 text-[10px] font-mono">
+                            <div class="flex flex-wrap gap-1.5">
+                                ${art.topics.map(t => `<span class="text-slate-400 bg-slate-950 px-2 py-0.5 rounded border border-slate-800">#${t}</span>`).join('')}
+                            </div>
+                            <button onclick="openDetailModal('${art.id}')" class="text-amber-400 hover:text-amber-300 flex items-center gap-1 font-semibold">
+                                <span>Analyse Stratégique</span>
+                                <i class="fa-solid fa-chevron-right text-[9px]"></i>
+                            </button>
+                        </div>
+                    </div>
+                `;
+            }).join('');
         }
 
-        // 4. WORLD CLOCK CAROUSEL
-        function initClockWidget() {
-            renderClockDots();
-            updateClockDisplay();
-
-            // Refresh time string every second
-            setInterval(updateClockDisplay, 1000);
-
-            // Start auto rotation
-            startClockRotation();
-        }
-
-        function startClockRotation() {
-            if (tzRotationTimer) clearInterval(tzRotationTimer);
-            tzRotationTimer = setInterval(() => {
-                if (!isClockPaused) {
-                    nextTimezone(false);
-                }
-            }, 3500);
-        }
-
-        function pauseClockRotation() {
-            isClockPaused = true;
-            updatePauseButtonUI();
-        }
-
-        function resumeClockRotation() {
-            isClockPaused = false;
-            updatePauseButtonUI();
-        }
-
-        function toggleClockPause() {
-            isClockPaused = !isClockPaused;
-            updatePauseButtonUI();
-        }
-
-        function updatePauseButtonUI() {
-            const btn = document.getElementById('pausePlayBtn');
-            if (isClockPaused) {
-                btn.innerHTML = `<i class="fa-solid fa-play text-amber-400"></i>`;
-                btn.title = "Reprendre la rotation";
-            } else {
-                btn.innerHTML = `<i class="fa-solid fa-pause"></i>`;
-                btn.title = "Mettre en pause";
-            }
-        }
-
-        function renderClockDots() {
-            const dotsContainer = document.getElementById('tzDots');
-            dotsContainer.innerHTML = TIMEZONES.map((_, idx) => `
-                <button onclick="selectTimezone(${idx})" class="w-1.5 h-1.5 rounded-full transition-all ${idx === currentTzIdx ? 'bg-amber-400 w-3' : 'bg-slate-700 hover:bg-slate-500'}"></button>
+        // RENDER TOPIC CLOUD
+        function renderTopicCloud() {
+            const container = document.getElementById('topicCloud');
+            container.innerHTML = TOPICS_DATA.map(t => `
+                <div class="px-3 py-1.5 rounded-xl bg-slate-900 border border-slate-800 hover:border-amber-500/40 transition-all flex items-center gap-2 cursor-pointer" onclick="setSearchTerm('${t.text}')">
+                    <span class="text-xs font-semibold text-slate-200">${t.text}</span>
+                    <span class="text-[9px] font-mono text-emerald-400 bg-emerald-950/60 px-1.5 py-0.2 rounded border border-emerald-800">${t.velocity}</span>
+                </div>
             `).join('');
         }
 
-        function selectTimezone(idx) {
-            if (idx === currentTzIdx) return;
-            currentTzIdx = idx;
-            triggerClockTransition();
-            startClockRotation();
-        }
-
-        function nextTimezone(manual = true) {
-            currentTzIdx = (currentTzIdx + 1) % TIMEZONES.length;
-            triggerClockTransition();
-            if (manual) startClockRotation();
-        }
-
-        function prevTimezone() {
-            currentTzIdx = (currentTzIdx - 1 + TIMEZONES.length) % TIMEZONES.length;
-            triggerClockTransition();
-            startClockRotation();
-        }
-
-        function triggerClockTransition() {
-            const container = document.getElementById('clockContainer');
-            container.classList.remove('clock-fade-active');
-            container.classList.add('clock-fade-exit');
-
-            setTimeout(() => {
-                updateClockDisplay();
-                renderClockDots();
-                container.classList.remove('clock-fade-exit');
-                container.classList.add('clock-fade-enter');
-
-                requestAnimationFrame(() => {
-                    requestAnimationFrame(() => {
-                        container.classList.remove('clock-fade-enter');
-                        container.classList.add('clock-fade-active');
-                    });
-                });
-            }, 250);
-        }
-
-        function updateClockDisplay() {
-            const tz = TIMEZONES[currentTzIdx];
-            const now = new Date();
-
-            const timeFormatter = new Intl.DateTimeFormat('fr-FR', {
-                timeZone: tz.zone,
-                hour: '2-digit',
-                minute: '2-digit',
-                second: '2-digit',
-                hour12: false
-            });
-
-            const dateFormatter = new Intl.DateTimeFormat('fr-FR', {
-                timeZone: tz.zone,
-                weekday: 'short',
-                day: '2-digit',
-                month: 'short',
-                year: 'numeric'
-            });
-
-            // Calculate precise UTC offset
-            const nowInTz = new Date(now.toLocaleString('en-US', { timeZone: tz.zone }));
-            const nowInUtc = new Date(now.toLocaleString('en-US', { timeZone: 'UTC' }));
-            const offsetDiff = Math.round((nowInTz - nowInUtc) / (1000 * 60 * 60));
-            const offsetStr = `UTC${offsetDiff >= 0 ? '+' : ''}${offsetDiff}`;
-
-            document.getElementById('tzFlag').innerText = tz.flag;
-            
-            const cityEl = document.getElementById('tzCity');
-            cityEl.innerText = tz.city;
-            cityEl.className = `text-xs font-bold tracking-wide uppercase font-mono ${tz.textColor}`;
-
-            const badgeEl = document.getElementById('tzBadge');
-            badgeEl.innerText = tz.badge;
-            badgeEl.className = `text-[9px] font-mono px-1.5 py-0.2 rounded border ${tz.badgeStyle}`;
-
-            document.getElementById('tzDate').innerText = dateFormatter.format(now);
-            document.getElementById('tzTime').innerText = timeFormatter.format(now);
-            document.getElementById('tzOffset').innerText = offsetStr;
-        }
-
-        // 5. CARDS & HUB LOGIC
-        function saveState() {
-            localStorage.setItem('ares_hub_cards_local', JSON.stringify(cardsData));
-        }
-
-        function renderAllCards() {
-            const categories = ['world', 'opsec', 'indice'];
-
-            categories.forEach(cat => {
-                const container = document.getElementById(`grid-${cat}`);
-                const items = cardsData.filter(c => c.category === cat);
-                document.getElementById(`count-${cat}`).innerText = `${items.length} module${items.length > 1 ? 's' : ''}`;
-
-                container.innerHTML = items.map(card => createCardHTML(card)).join('');
-            });
-
-            filterCards();
-        }
-
-        function createCardHTML(card) {
-            let statusColor = "bg-emerald-500/10 text-emerald-400 border-emerald-500/30";
-            if(card.status === "Tunnel Actif") statusColor = "bg-cyan-500/10 text-cyan-300 border-cyan-500/30";
-            if(card.status === "Local Ready") statusColor = "bg-amber-500/10 text-amber-300 border-amber-500/30";
-            if(card.status === "Maintenance") statusColor = "bg-rose-500/10 text-rose-400 border-rose-500/30";
-            if(card.status === "Securisé") statusColor = "bg-blue-500/10 text-blue-300 border-blue-500/30";
-
-            let categoryGlow = "hover:border-amber-500/40";
-            let iconBg = "bg-amber-500/10 text-amber-400 border-amber-500/20";
-            if (card.category === 'opsec') {
-                categoryGlow = "hover:border-cyan-500/40";
-                iconBg = "bg-cyan-500/10 text-cyan-400 border-cyan-500/20";
-            } else if (card.category === 'indice') {
-                categoryGlow = "hover:border-emerald-500/40";
-                iconBg = "bg-emerald-500/10 text-emerald-400 border-emerald-500/20";
-            }
-
-            return `
-                <div class="card-item glass-panel glass-panel-hover rounded-2xl p-5 flex flex-col justify-between border relative group ${categoryGlow}" data-title="${card.title.toLowerCase()}" data-desc="${card.description.toLowerCase()}" data-url="${card.url.toLowerCase()}">
-                    <div>
-                        <div class="flex items-start justify-between gap-3 mb-3">
-                            <div class="p-3 rounded-xl ${iconBg} border transition-transform group-hover:scale-105">
-                                <i class="${card.icon} text-lg"></i>
-                            </div>
-                            <div class="flex items-center gap-2">
-                                <span class="px-2 py-0.5 rounded-full text-[10px] font-mono border ${statusColor}">
-                                    ${card.status}
-                                </span>
-                                <button onclick="openEditModal('${card.id}')" title="Éditer la carte/URL" class="opacity-0 group-hover:opacity-100 p-1.5 text-slate-400 hover:text-white rounded-lg hover:bg-slate-800 transition-all">
-                                    <i class="fa-solid fa-pen-to-square text-xs"></i>
-                                </button>
-                            </div>
-                        </div>
-
-                        <h3 class="font-bold text-white text-base tracking-wide group-hover:text-amber-400 transition-colors">
-                            <a href="${card.url}" class="hover:underline">${card.title}</a>
-                        </h3>
-                        <p class="text-slate-400 text-xs mt-2 leading-relaxed">
-                            ${card.description}
-                        </p>
-                    </div>
-
-                    <div class="mt-5 pt-4 border-t border-slate-800/80 flex items-center justify-between">
-                        <span class="text-[10px] font-mono text-slate-500 truncate max-w-[170px]" title="${card.url}">
-                            ${card.url.replace('https://', '').replace('http://', '')}
+        // RENDER PLATFORM SENTIMENT
+        function renderPlatformSentiment() {
+            const container = document.getElementById('platformSentimentList');
+            container.innerHTML = PLATFORMS_SENTIMENT.map(p => `
+                <div class="space-y-1">
+                    <div class="flex justify-between items-center text-[11px]">
+                        <span class="text-slate-300 flex items-center gap-1.5">
+                            <i class="${p.icon} text-amber-400"></i> ${p.name}
                         </span>
-                        <div class="flex items-center gap-2">
-                            <a href="${card.url}" title="Ouvrir dans cet onglet" class="px-2.5 py-1 bg-slate-800/80 hover:bg-slate-700 text-slate-300 rounded text-[11px] font-mono transition-colors">
-                                <i class="fa-solid fa-location-arrow"></i>
-                            </a>
-                            <a href="${card.url}" target="_blank" rel="noopener noreferrer" title="Ouvrir dans un nouvel onglet" class="px-2.5 py-1 bg-amber-500/20 hover:bg-amber-500/30 text-amber-300 border border-amber-500/30 rounded text-[11px] font-mono transition-colors flex items-center gap-1">
-                                <span>Lancer</span>
-                                <i class="fa-solid fa-arrow-up-right-from-square text-[9px]"></i>
-                            </a>
-                        </div>
+                        <span class="text-slate-500">${p.pos}% pos.</span>
+                    </div>
+                    <div class="w-full bg-slate-800 h-1.5 rounded-full overflow-hidden flex">
+                        <div class="bg-emerald-500 h-full" style="width: ${p.pos}%"></div>
+                        <div class="bg-slate-500 h-full" style="width: ${p.neu}%"></div>
+                        <div class="bg-rose-500 h-full" style="width: ${p.neg}%"></div>
                     </div>
                 </div>
-            `;
+            `).join('');
         }
 
-        // 6. SEARCH & FILTERING
-        function filterCards() {
+        // CHART JS INITIALIZATION
+        function initCharts() {
+            const ctx = document.getElementById('channelChart').getContext('2d');
+            channelChartInstance = new Chart(ctx, {
+                type: 'doughnut',
+                data: {
+                    labels: ['Presse Nationale', 'Médias Régionaux', 'X / Twitter', 'Reddit/Forums', 'Parlement'],
+                    datasets: [{
+                        data: [35, 20, 25, 12, 8],
+                        backgroundColor: ['#D4AF37', '#06B6D4', '#F43F5E', '#10B981', '#64748B'],
+                        borderWidth: 0
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            position: 'bottom',
+                            labels: {
+                                color: '#94a3b8',
+                                font: { family: 'JetBrains Mono', size: 10 },
+                                padding: 12
+                            }
+                        }
+                    },
+                    cutout: '70%'
+                }
+            });
+        }
+
+        // FILTER ENGINE
+        function applyFilters() {
             const query = document.getElementById('searchInput').value.toLowerCase().trim();
-            const clearBtn = document.getElementById('clearSearchBtn');
-            const cards = document.querySelectorAll('.card-item');
-            let visibleCount = 0;
+            const timeVal = document.getElementById('timeFilter').value;
+            const channelVal = document.getElementById('channelFilter').value;
+            const jurisdictionVal = document.getElementById('jurisdictionFilter').value;
 
-            if (query.length > 0) {
-                clearBtn.classList.remove('hidden');
-            } else {
-                clearBtn.classList.add('hidden');
-            }
+            document.getElementById('clearSearchBtn').classList.toggle('hidden', query.length === 0);
 
-            cards.forEach(card => {
-                const title = card.getAttribute('data-title');
-                const desc = card.getAttribute('data-desc');
-                const url = card.getAttribute('data-url');
+            filteredArticles = ARTICLES_DATA.filter(art => {
+                const matchesSearch = query === '' || 
+                    art.title.toLowerCase().includes(query) || 
+                    art.summary.toLowerCase().includes(query) ||
+                    art.topics.some(t => t.toLowerCase().includes(query));
 
-                if (title.includes(query) || desc.includes(query) || url.includes(query)) {
-                    card.classList.remove('hidden');
-                    visibleCount++;
-                } else {
-                    card.classList.add('hidden');
-                }
+                const matchesTime = timeVal === 'all' || art.timeCategory === timeVal;
+                const matchesChannel = channelVal === 'all' || art.channel === channelVal;
+                const matchesJurisdiction = jurisdictionVal === 'all' || art.jurisdiction === jurisdictionVal;
+
+                return matchesSearch && matchesTime && matchesChannel && matchesJurisdiction;
             });
 
-            document.querySelectorAll('.category-section').forEach(sec => {
-                const visibleInCat = sec.querySelectorAll('.card-item:not(.hidden)').length;
-                if(visibleInCat === 0 && query.length > 0) {
-                    sec.classList.add('hidden');
-                } else {
-                    sec.classList.remove('hidden');
-                }
-            });
+            renderArticles(filteredArticles);
+            updateKPIs(filteredArticles);
+        }
 
-            const noResults = document.getElementById('noResults');
-            if (visibleCount === 0 && query.length > 0) {
-                noResults.classList.remove('hidden');
-            } else {
-                noResults.classList.add('hidden');
-            }
+        function setSearchTerm(term) {
+            document.getElementById('searchInput').value = term;
+            applyFilters();
         }
 
         function clearSearch() {
             document.getElementById('searchInput').value = '';
-            filterCards();
+            applyFilters();
         }
 
-        // 7. MODALS & CARD MANAGEMENT
-        function openEditModal(cardId) {
-            const card = cardsData.find(c => c.id === cardId);
-            if (!card) return;
-
-            document.getElementById('modalTitle').innerText = "Éditer l'outil";
-            document.getElementById('cardId').value = card.id;
-            document.getElementById('cardTitle').value = card.title;
-            document.getElementById('cardCategory').value = card.category;
-            document.getElementById('cardUrl').value = card.url;
-            document.getElementById('cardDescription').value = card.description;
-            document.getElementById('cardStatus').value = card.status;
-            document.getElementById('cardIcon').value = card.icon;
-
-            document.getElementById('deleteCardBtn').classList.remove('hidden');
-            document.getElementById('editModal').classList.remove('hidden');
+        function resetAllFilters() {
+            document.getElementById('searchInput').value = '';
+            document.getElementById('timeFilter').value = '24h';
+            document.getElementById('channelFilter').value = 'all';
+            document.getElementById('jurisdictionFilter').value = 'all';
+            applyFilters();
+            showToast("Tous les filtres ont été réinitialisés.");
         }
 
-        function openAddModal() {
-            document.getElementById('modalTitle').innerText = "Ajouter un nouvel outil local/web";
-            document.getElementById('cardForm').reset();
-            document.getElementById('cardId').value = '';
-            document.getElementById('cardIcon').value = 'fa-solid fa-server';
+        // UPDATE KPIS DYNAMICALLY
+        function updateKPIs(articles) {
+            if (articles.length === 0) return;
 
-            document.getElementById('deleteCardBtn').classList.add('hidden');
-            document.getElementById('editModal').classList.remove('hidden');
+            let totalImpact = 0;
+            let posCount = 0;
+            articles.forEach(a => {
+                totalImpact += a.impactScore;
+                if (a.sentiment === 'Positif' || a.sentiment === 'Neutre') posCount++;
+            });
+
+            const posRatio = ((posCount / articles.length) * 100).toFixed(1);
+            document.getElementById('kpiSentiment').innerText = `+${posRatio}%`;
+            document.getElementById('kpiVolume').innerText = (articles.length * 7140).toLocaleString();
         }
 
-        function closeModal() {
-            document.getElementById('editModal').classList.add('hidden');
+        // MODAL DETAIL
+        function openDetailModal(articleId) {
+            const article = ARTICLES_DATA.find(a => a.id === articleId);
+            if (!article) return;
+
+            document.getElementById('modalTitle').innerText = article.title;
+            document.getElementById('modalSourceBadge').innerText = article.sourceName;
+            document.getElementById('modalSummary').innerText = article.summary;
+            document.getElementById('modalImpact').innerText = `${article.impactScore} / 10`;
+            document.getElementById('modalSentiment').innerText = article.sentiment;
+            document.getElementById('modalRecommendation').innerText = article.recommendation;
+
+            document.getElementById('detailModal').classList.remove('hidden');
         }
 
-        function saveCardData(event) {
-            event.preventDefault();
+        function closeDetailModal() {
+            document.getElementById('detailModal').classList.add('hidden');
+        }
 
-            const id = document.getElementById('cardId').value;
-            const title = document.getElementById('cardTitle').value;
-            const category = document.getElementById('cardCategory').value;
-            let url = document.getElementById('cardUrl').value.trim();
-            const description = document.getElementById('cardDescription').value;
-            const status = document.getElementById('cardStatus').value;
-            const icon = document.getElementById('cardIcon').value;
+        // BRIEFING GENERATOR WITH GEMINI API
+        async function generateGeminiBriefing() {
+            const briefingModal = document.getElementById('briefingModal');
+            const loader = document.getElementById('briefingLoader');
+            const textContainer = document.getElementById('briefingText');
 
-            // Ensure valid protocol prefix if missing
-            if (!url.startsWith('http://') && !url.startsWith('https://') && !url.startsWith('file://')) {
-                url = 'http://' + url;
-            }
+            briefingModal.classList.remove('hidden');
+            loader.classList.remove('hidden');
+            textContainer.classList.add('hidden');
 
-            if (id) {
-                const index = cardsData.findIndex(c => c.id === id);
-                if (index !== -1) {
-                    cardsData[index] = { ...cardsData[index], title, category, url, description, status, icon };
-                }
-            } else {
-                const newCard = {
-                    id: 'local-' + Date.now(),
-                    title,
-                    category,
-                    url,
-                    description,
-                    status,
-                    icon
+            const currentArticles = filteredArticles.length > 0 ? filteredArticles : ARTICLES_DATA;
+            const articlesContext = currentArticles.map(a => `- [${a.sourceName}] ${a.title} (${a.sentiment}, Impact: ${a.impactScore}/10) : ${a.summary}`).join('\n');
+
+            const systemPrompt = `Tu es le Directeur Général de l'Intelligence Média et des Affaires Publiques pour l'organisation de prestige Indice Public.
+Rédige une note de synthèse stratégique haut niveau (Executive Briefing) pour le comité de direction à partir des signaux médias collectés.
+Structure la réponse en français avec un ton institutionnel rigoureux, concis et analytique :
+1. FAITS MARQUANTS & TENDANCE GLOBALE
+2. POINTS DE VIGILANCE & RISQUE DE CONTROVERSE
+3. RECOMMANDATIONS DE COMMUNICATION DE SRA
+Utilise un formatage propre avec des titres clairs et des puces.`;
+
+            const userQuery = `Voici les signaux médias et sociaux récents captés par Indice Public :\n\n${articlesContext}\n\nFormule la Note de Synthèse Stratégique pour les Décideurs.`;
+
+            try {
+                const apiKey = ""; // Canvas runtime environment automatically provides default API key
+                const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-3-flash-preview:generateContent?key=${apiKey}`;
+
+                const payload = {
+                    contents: [{ parts: [{ text: userQuery }] }],
+                    systemInstruction: { parts: [{ text: systemPrompt }] }
                 };
-                cardsData.push(newCard);
+
+                const response = await fetch(apiUrl, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(payload)
+                });
+
+                const result = await response.json();
+                const briefingMarkdown = result.candidates?.[0]?.content?.parts?.[0]?.text;
+
+                if (briefingMarkdown) {
+                    renderBriefingOutput(briefingMarkdown);
+                } else {
+                    renderBriefingFallback();
+                }
+            } catch (err) {
+                console.warn("API Call Fallback triggered", err);
+                renderBriefingFallback();
+            } finally {
+                loader.classList.add('hidden');
+                textContainer.classList.remove('hidden');
             }
-
-            saveState();
-            renderAllCards();
-            closeModal();
-            showToast('Outil et URL enregistrés.');
         }
 
-        function deleteCurrentCard() {
-            const id = document.getElementById('cardId').value;
-            if (!id) return;
+        function renderBriefingOutput(text) {
+            const formatted = text
+                .replace(/^### (.*$)/gim, '<h4 class="font-mono text-amber-400 font-bold uppercase tracking-wide mt-3 mb-1 text-[12px]">$1</h4>')
+                .replace(/^## (.*$)/gim, '<h3 class="font-mono text-amber-300 font-bold uppercase tracking-wider mt-4 mb-2 text-[13px] border-b border-slate-800 pb-1">$1</h3>')
+                .replace(/^\* (.*$)/gim, '<li class="ml-4 list-disc text-slate-300">$1</li>')
+                .replace(/\*\*(.* animate-pulse)?\*\*/g, '<strong class="text-white font-semibold">$1</strong>')
+                .replace(/\n\n/g, '<br>');
 
-            cardsData = cardsData.filter(c => c.id !== id);
-            saveState();
-            renderAllCards();
-            closeModal();
-            showToast('Outil supprimé du hub.');
+            document.getElementById('briefingText').innerHTML = `
+                <div class="bg-slate-900/80 p-4 rounded-xl border border-slate-800 space-y-2 leading-relaxed text-slate-200">
+                    ${formatted}
+                </div>
+            `;
         }
 
-        function exportConfig() {
-            const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(cardsData, null, 2));
+        function renderBriefingFallback() {
+            document.getElementById('briefingText').innerHTML = `
+                <div class="bg-slate-900/80 p-4 rounded-xl border border-slate-800 space-y-3 leading-relaxed">
+                    <h3 class="font-mono text-amber-300 font-bold uppercase tracking-wider text-xs border-b border-slate-800 pb-1">1. SYNTHÈSE STRATÉGIQUE DES DONNÉES (MODE SECOUR)</h3>
+                    <p class="text-slate-300">L'opinion publique affiche une tonalité globalement favorable (+64.8%), tirée par les annonces relatives aux infrastructures et à la transparence des algorithmes étatiques.</p>
+
+                    <h3 class="font-mono text-amber-300 font-bold uppercase tracking-wider text-xs border-b border-slate-800 pb-1">2. POINTS DE VIGILANCE ROUGE</h3>
+                    <p class="text-slate-300">Accélération sensible du hashtag <span class="text-rose-400 font-mono">#TaxeEquitable</span> sur X/Twitter. Risque de cristallisation du mécontentement sur le volet fiscalités régionales.</p>
+
+                    <h3 class="font-mono text-amber-300 font-bold uppercase tracking-wider text-xs border-b border-slate-800 pb-1">3. ORIENTATIONS COMMUNICATIONNELLES</h3>
+                    <p class="text-slate-300">1. Publier sans délai le rapport d'impact budgétaire vulgarisé.<br>2. Maintenir une posture d'écoute proactive envers le secteur agricole.</p>
+                </div>
+            `;
+        }
+
+        function closeBriefingModal() {
+            document.getElementById('briefingModal').classList.add('hidden');
+        }
+
+        function copyBriefingToClipboard() {
+            const content = document.getElementById('briefingText').innerText;
+            const tempInput = document.createElement("textarea");
+            tempInput.value = content;
+            document.body.appendChild(tempInput);
+            tempInput.select();
+            document.execCommand("copy");
+            document.body.removeChild(tempInput);
+            showToast("Note de synthèse copiée dans le presse-papier !");
+        }
+
+        function exportDataReport() {
+            const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(filteredArticles, null, 2));
             const downloadAnchor = document.createElement('a');
             downloadAnchor.setAttribute("href", dataStr);
-            downloadAnchor.setAttribute("download", `ares_local_hub_config_${new Date().toISOString().slice(0,10)}.json`);
+            downloadAnchor.setAttribute("download", `indice_public_rapport_${new Date().toISOString().slice(0,10)}.json`);
             document.body.appendChild(downloadAnchor);
             downloadAnchor.click();
             downloadAnchor.remove();
-            showToast('Configuration exportée au format JSON.');
-        }
-
-        function importConfig(event) {
-            const fileReader = new FileReader();
-            fileReader.onload = function(e) {
-                try {
-                    const parsed = JSON.parse(e.target.result);
-                    if (Array.isArray(parsed)) {
-                        cardsData = parsed;
-                        saveState();
-                        renderAllCards();
-                        showToast('Configuration importée avec succès.');
-                    } else {
-                        alert('Format de fichier JSON invalide.');
-                    }
-                } catch (err) {
-                    alert('Erreur lors de la lecture du fichier JSON.');
-                }
-            };
-            fileReader.readAsText(event.target.files[0]);
-        }
-
-        function resetToDefaults() {
-            cardsData = [...DEFAULT_CARDS];
-            saveState();
-            renderAllCards();
-            showToast('URLs réinitialisées aux valeurs par défaut.');
+            showToast("Export JSON généré avec succès.");
         }
 
         function showToast(msg) {
             const toast = document.getElementById('toast');
             document.getElementById('toastMessage').innerText = msg;
             toast.classList.remove('translate-y-20', 'opacity-0');
-            
             setTimeout(() => {
                 toast.classList.add('translate-y-20', 'opacity-0');
             }, 3000);
         }
-
-        // Initialize App on Window Load
-        window.onload = initApp;
     </script>
 </body>
 </html>
